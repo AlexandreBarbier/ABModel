@@ -9,12 +9,6 @@
 import UIKit
 
 /**
-* IMPROVEMENT : I have to find a way to parse custom typed array from this class in order to avoid overriding
-*               setValue(value: AnyObject!, forKey key: String!) in each subclass
-*/
-
-
-/**
 *
 * You just need to inherit from this class to be able to create object from JSON
 * You have to name your properties like the JSON keys or override the method replaceKey to rename a JSON key
