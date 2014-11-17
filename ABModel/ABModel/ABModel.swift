@@ -49,7 +49,7 @@ public class ABModel: NSObject, Printable {
         self.setValuesForKeysWithDictionary(finalDictionnary)
     }
     
-    override public func setValue(value: AnyObject!, forKey key: String!)  {
+    override public func setValue(value: AnyObject!, forKey key: String)  {
         
 
         //here we check if the value is nil to avoid crash
