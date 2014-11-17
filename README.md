@@ -15,14 +15,23 @@ In order to write less code you just have to name your object's properties the s
 
 #### Sample
 ```class Example : ABModel {
+	
 	var exampleID = 0
+	
 	var name = ""
+	
 	var tests = []
+	
 	public func replaceKey(key:String) -> String {
+		
 		if (key == "id") {
+			
 			return "exampleID"
+			
 		}
+		
 	}
+	
 }```
 
 To create an instance of Example
