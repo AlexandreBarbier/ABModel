@@ -14,7 +14,9 @@ I use introspection to retrieve all the properties of your model from the JSon.
 In order to write less code you just have to name your object's properties the same way as your JSon keys. If you prefer to code multiple method, you can override `replaceKey(key:String) -> String` in your ABModel subclass and for each JSon key you want to rename return your property name as a string 
 
 #### Sample
-```class Example : ABModel {
+
+```
+class Example : ABModel {
 	var exampleID = 0
 	var name = ""
 	var tests = []
@@ -23,10 +25,13 @@ In order to write less code you just have to name your object's properties the s
 			return "exampleID"
 		}
 	}
-}```
+}
+```
 
 To create an instance of Example
 
-```func createExampleWithDictionary(JSonExample:Dictionary<String, AnyObject>) -> Exemple {
+```
+func createExampleWithDictionary(JSonExample:Dictionary<String, AnyObject>) -> Exemple {
 	 return Exemple(dictionary:JSonExample)
-}```
+}
+```
