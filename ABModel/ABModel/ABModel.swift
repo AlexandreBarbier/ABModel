@@ -24,8 +24,7 @@ import UIKit
 public class ABModel: NSObject, NSCoding {
 
     public override var description :String {
-        get
-        {
+        get {
             return "ABModel super class you should override this method in \(NSStringFromClass(self.dynamicType))"
         }
     }
