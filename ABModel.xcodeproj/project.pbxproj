@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		8DB533E11AFFEB74008C2078 /* NSDataJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB533E01AFFEB74008C2078 /* NSDataJSON.swift */; };
+		8DEF87CF1D1301FF00DF5D27 /* CloudKitExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DEF87CE1D1301FF00DF5D27 /* CloudKitExtension.swift */; };
 		AC3E690919B4C84500681A5A /* ABModel.h in Headers */ = {isa = PBXBuildFile; fileRef = AC3E690819B4C84500681A5A /* ABModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AC3E691319B4C84500681A5A /* ABModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3E691219B4C84500681A5A /* ABModelTests.swift */; };
 		AC3E692619B4C86700681A5A /* ABModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3E692519B4C86700681A5A /* ABModel.swift */; };
@@ -15,6 +16,7 @@
 
 /* Begin PBXFileReference section */
 		8DB533E01AFFEB74008C2078 /* NSDataJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSDataJSON.swift; sourceTree = "<group>"; };
+		8DEF87CE1D1301FF00DF5D27 /* CloudKitExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitExtension.swift; sourceTree = "<group>"; };
 		AC3E690319B4C84500681A5A /* ABModel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ABModel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC3E690719B4C84500681A5A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AC3E690819B4C84500681A5A /* ABModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ABModel.h; sourceTree = "<group>"; };
@@ -71,6 +73,7 @@
 		AC3E690519B4C84500681A5A /* ABModel */ = {
 			isa = PBXGroup;
 			children = (
+				8DEF87CE1D1301FF00DF5D27 /* CloudKitExtension.swift */,
 				8DB533DF1AFFEB2E008C2078 /* Helpers */,
 				AC3E692519B4C86700681A5A /* ABModel.swift */,
 				AC3E690819B4C84500681A5A /* ABModel.h */,
@@ -211,6 +214,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8DEF87CF1D1301FF00DF5D27 /* CloudKitExtension.swift in Sources */,
 				8DB533E11AFFEB74008C2078 /* NSDataJSON.swift in Sources */,
 				AC3E692619B4C86700681A5A /* ABModel.swift in Sources */,
 			);
