@@ -14,7 +14,7 @@ import UIKit
  */
 
 
- /**
+/**
  *
  * You just need to inherit from this class to be able to create object from JSON
  * You have to name your properties like the JSON keys or override the method replaceKey to rename a JSON key
@@ -22,18 +22,18 @@ import UIKit
  */
 
 public class ABModel: NSObject, NSCoding {
-
+    
     public override var description :String {
         get {
             return "ABModel super class you should override this method in \(NSStringFromClass(self.dynamicType))"
         }
     }
-
+    
     public required init?(coder aDecoder: NSCoder) {
         super.init()
         let dictionary = aDecoder.decodeObjectForKey("root") as! Dictionary<String, AnyObject>
         var finalDictionnary =  aDecoder.decodeObjectForKey("root") as! Dictionary<String, AnyObject>
-
+        
         for (key, value) in dictionary {
             if !self.respondsToSelector(Selector(key)) {
                 let replacementKey = self.replaceKey(key)
@@ -46,25 +46,25 @@ public class ABModel: NSObject, NSCoding {
                     finalDictionnary.removeAtIndex(finalDictionnary.indexForKey(key)!)
                 }
             }
-
+            
         }
         self.setValuesForKeysWithDictionary(finalDictionnary)
         //self.init(dictionary: aDecoder.decodeObjectForKey("root") as! Dictionary<String, AnyObject>)
     }
-
+    
     public func encodeWithCoder(aCoder: NSCoder) {
         let dico = self.toJSON()
         aCoder.encodeObject(dico, forKey: "root")
     }
-
+    
     public override init() {
         super.init()
     }
-
+    
     public required init(dictionary:Dictionary<String, AnyObject>) {
         super.init()
         var finalDictionnary = dictionary
-
+        
         for (key, value) in dictionary {
             if !self.respondsToSelector(Selector(key)) {
                 let replacementKey = self.replaceKey(key)
@@ -77,19 +77,19 @@ public class ABModel: NSObject, NSCoding {
                     finalDictionnary.removeAtIndex(finalDictionnary.indexForKey(key)!)
                 }
             }
-
+            
         }
         self.setValuesForKeysWithDictionary(finalDictionnary)
     }
-
+    
     override public func setValue(value: AnyObject!, forKey key: String)  {
-
+        
         /**
-        * here we want to check the type of the property named key to know if it's an array / dictionnary.
-        * if it's an array / dictionnary we have to know the objects type contain in it to make something smart
-        * if we can't find a solution here we just have to override setValue in each subclass and apply the correct treatment
-        * for nested properties
-        */
+         * here we want to check the type of the property named key to know if it's an array / dictionnary.
+         * if it's an array / dictionnary we have to know the objects type contain in it to make something smart
+         * if we can't find a solution here we just have to override setValue in each subclass and apply the correct treatment
+         * for nested properties
+         */
         //here we check if the value is nil to avoid crash
         guard value != nil else {
             return
@@ -104,32 +104,32 @@ public class ABModel: NSObject, NSCoding {
             k!.removeAll(keepCapacity: false)
             for val in value as! Array<Dictionary<String, AnyObject>> {
                 let l = t.init(dictionary: val)
-
+                
                 k!.append(l)
             }
             super.setValue(k, forKey: key)
-
+            
         }
         else if (value is Dictionary<String, AnyObject> &&
             !(self.valueForKey(key) is Dictionary<String, AnyObject>)) {
-                if let k = self.valueForKey(key) as? ABModel, val = value as? Dictionary<String, AnyObject> {
-                    let t = k.dynamicType
-                    let newVal = t.init(dictionary: val)
-                    super.setValue(newVal, forKey: key)
-                }
+            if let k = self.valueForKey(key) as? ABModel, val = value as? Dictionary<String, AnyObject> {
+                let t = k.dynamicType
+                let newVal = t.init(dictionary: val)
+                super.setValue(newVal, forKey: key)
+            }
         }
         else {
             super.setValue(value, forKey: key)
         }
     }
-
+    
     /**
      * You should override this method only if you want to rename JSON key
      */
     public func replaceKey(key:String) -> String {
         return "";
     }
-
+    
     public func toJSON() -> Dictionary<String, AnyObject> {
         let k = Mirror(reflecting: self)
         let children = AnyRandomAccessCollection(k.children)

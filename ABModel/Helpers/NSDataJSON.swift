@@ -11,10 +11,8 @@ import UIKit
 public extension NSData {
     func toJSON() -> Dictionary<String, AnyObject> {
         do {
-            if let data = try NSJSONSerialization.JSONObjectWithData(self, options: NSJSONReadingOptions.MutableLeaves) as? Dictionary<String, AnyObject> {
-                return data
-            }
-            return [:]
+            let data = try NSJSONSerialization.JSONObjectWithData(self, options: NSJSONReadingOptions.MutableLeaves) as! Dictionary<String, AnyObject>
+            return data
         }
         catch {
             return [:]

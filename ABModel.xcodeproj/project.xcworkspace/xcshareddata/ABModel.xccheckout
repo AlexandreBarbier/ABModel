@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>B6233BB9-3586-4126-8707-1C50B007E3E8</string>
+	<key>IDESourceControlProjectName</key>
+	<string>ABModel</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>5FBE66F67624FB1A91268E58B5FE79FE2EC0228A</key>
+		<string>62.210.238.47:SwiftLib</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>ABModel/ABModel.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>5FBE66F67624FB1A91268E58B5FE79FE2EC0228A</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>62.210.238.47:SwiftLib</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>5FBE66F67624FB1A91268E58B5FE79FE2EC0228A</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>5FBE66F67624FB1A91268E58B5FE79FE2EC0228A</string>
+			<key>IDESourceControlWCCName</key>
+			<string>SwiftLib</string>
+		</dict>
+	</array>
+</dict>
+</plist>
