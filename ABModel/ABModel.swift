@@ -17,43 +17,43 @@ import UIKit
  *
  */
 
-public class ABModel: NSObject, NSCoding {
+open class ABModel: NSObject, NSCoding {
     
-    public override var description :String {
+    open override var description :String {
         get
         {
-            return "ABModel super class you should override this method in \(NSStringFromClass(self.dynamicType))"
+            return "ABModel super class you should override this method in \(NSStringFromClass(type(of: self)))"
         }
     }
     
     public required init?(coder aDecoder: NSCoder) {
         super.init()
-        let dictionary = aDecoder.decodeObjectForKey("root") as! Dictionary<String, AnyObject>
-        var finalDictionnary =  aDecoder.decodeObjectForKey("root") as! Dictionary<String, AnyObject>
+        let dictionary = aDecoder.decodeObject(forKey: "root") as! Dictionary<String, AnyObject>
+        var finalDictionnary =  aDecoder.decodeObject(forKey: "root") as! Dictionary<String, AnyObject>
         
         for (key, value) in dictionary {
-            if !self.respondsToSelector(Selector(key)) {
+            if !self.responds(to: Selector(key)) {
                 let replacementKey = self.replaceKey(key)
                 if replacementKey.isEmpty {
-                    finalDictionnary.removeAtIndex(finalDictionnary.indexForKey(key)!)
-                    debugPrint("Forgoten key : \(key) in \(NSStringFromClass(self.dynamicType))")
+                    finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
+                    debugPrint("Forgoten key : \(key) in \(NSStringFromClass(type(of: self)))")
                 }
                 else {
                     finalDictionnary[replacementKey] = value;
-                    finalDictionnary.removeAtIndex(finalDictionnary.indexForKey(key)!)
+                    finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
                 }
             }
             if self.ignoreKey(key, value: value) {
-                finalDictionnary.removeAtIndex(finalDictionnary.indexForKey(key)!)
+                finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
             }
             
         }
-        self.setValuesForKeysWithDictionary(finalDictionnary)
+        self.setValuesForKeys(finalDictionnary)
     }
     
-    public func encodeWithCoder(aCoder: NSCoder) {
+    open func encode(with aCoder: NSCoder) {
         let dico = self.toJSON()
-        aCoder.encodeObject(dico, forKey: "root")
+        aCoder.encode(dico, forKey: "root")
     }
     
     public override init() {
@@ -66,28 +66,28 @@ public class ABModel: NSObject, NSCoding {
         
         for (key, value) in dictionary {
 
-            if !self.respondsToSelector(Selector(key)) {
+            if !self.responds(to: Selector(key)) {
                
                     let replacementKey = self.replaceKey(key)
                     if replacementKey.isEmpty {
-                        finalDictionnary.removeAtIndex(finalDictionnary.indexForKey(key)!)
-                        debugPrint("Forgoten key : \(key) in \(NSStringFromClass(self.dynamicType))")
+                        finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
+                        debugPrint("Forgoten key : \(key) in \(NSStringFromClass(type(of: self)))")
                     }
                     else {
                         finalDictionnary[replacementKey] = value
-                        finalDictionnary.removeAtIndex(finalDictionnary.indexForKey(key)!)
+                        finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
                     }
               
 
             }
             if self.ignoreKey(key, value: value) {
-                finalDictionnary.removeAtIndex(finalDictionnary.indexForKey(key)!)
+                finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
             }
         }
-        self.setValuesForKeysWithDictionary(finalDictionnary)
+        self.setValuesForKeys(finalDictionnary)
     }
     
-    override public func setValue(value: AnyObject!, forKey key: String)  {
+    override open func setValue(_ value: Any!, forKey key: String)  {
         
         /**
         * here we want to check the type of the property named key to know if it's an array / dictionnary.
@@ -100,14 +100,14 @@ public class ABModel: NSObject, NSCoding {
             return
         }
         if (value is [AnyObject] && value is Array<Dictionary<String, AnyObject>>) {
-            var k = self.valueForKey(key) as? [ABModel]
+            var k = self.value(forKey: key) as? [ABModel]
             
-            guard let val = k where val.count > 0 else {
-                print("\n#### FATAL ERROR ####\n key : \(key) is not initialised like this [CUSTOM_TYPE()] in \(NSStringFromClass(self.dynamicType))")
+            guard let val = k , val.count > 0 else {
+                print("\n#### FATAL ERROR ####\n key : \(key) is not initialised like this [CUSTOM_TYPE()] in \(NSStringFromClass(type(of: self)))")
                 fatalError("Error in parsing see console for more information")
             }
-            let t = val[0].dynamicType
-            k!.removeAll(keepCapacity: false)
+            let t = type(of: val[0])
+            k!.removeAll(keepingCapacity: false)
             for val in value as! Array<Dictionary<String, AnyObject>> {
                 let l = t.init(dictionary: val)
                 k!.append(l)
@@ -116,9 +116,9 @@ public class ABModel: NSObject, NSCoding {
             
         }
         else if (value is Dictionary<String, AnyObject> &&
-            !(self.valueForKey(key) is Dictionary<String, AnyObject>)) {
-                if let k = self.valueForKey(key) as? ABModel, val = value as? Dictionary<String, AnyObject> {
-                    let t = k.dynamicType
+            !(self.value(forKey: key) is Dictionary<String, AnyObject>)) {
+                if let k = self.value(forKey: key) as? ABModel, let val = value as? Dictionary<String, AnyObject> {
+                    let t = type(of: k)
                     let newVal = t.init(dictionary: val)
                     super.setValue(newVal, forKey: key)
                 }
@@ -131,25 +131,25 @@ public class ABModel: NSObject, NSCoding {
     /**
      * You should override this method only if you want to ignore JSON key
      */
-    public func ignoreKey(key:String, value:AnyObject) -> Bool {
+    open func ignoreKey(_ key:String, value:AnyObject) -> Bool {
         return false
     }
     
     /**
      * You should override this method only if you want to rename JSON key
      */
-    public func replaceKey(key:String) -> String {
+    open func replaceKey(_ key:String) -> String {
         return ""
     }
     
-    public func toJSON() -> Dictionary<String, AnyObject> {
+    open func toJSON() -> Dictionary<String, AnyObject> {
         let k = Mirror(reflecting: self)
         let children = AnyRandomAccessCollection(k.children)
         var json:Dictionary<String, AnyObject> = [:]
-        for (_, value) in  (children?.enumerate())! {
+        for (_, value) in  (children?.enumerated())! {
             if value.0 != "super" {
                 if let val = value.1 as? NSObject {
-                    if val != "" {
+					if val is String && String(describing:val) != "" {
                         json.updateValue(val, forKey: value.0!)
                     }
                 }
