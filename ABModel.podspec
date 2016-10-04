@@ -27,7 +27,7 @@ Pod::Spec.new do |s|
   s.author             = { "Alexandre Barbier" => "alexandr.barbier@gmail.com" }
   s.social_media_url   = "http://twitter.com/abarbier_"
 
-  s.platform     = :ios, "9.0"
+  s.platform     = :ios, "8.0"
 
   s.source       = { :git => "https://github.com/AlexandreBarbier/ABModel.git", :tag => "#{s.version}" }
   s.source_files  = "ABModel/*.swift"
