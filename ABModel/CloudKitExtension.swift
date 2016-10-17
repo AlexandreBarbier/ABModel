@@ -52,21 +52,17 @@ open class ABModelCloudKit : ABModel {
         operation.savePolicy = .changedKeys
         operation.perRecordCompletionBlock = { (record, error) in
             guard let rec = record else {
-                if let cp = completion {
-                    print("public save \(error)")
-                    OperationQueue.main.addOperation({ () -> Void in
-                        cp(record, error as NSError?)
-                    })
-                }
+                print("public save \(error)")
+                OperationQueue.main.addOperation({ () -> Void in
+                    completion?(record, error as NSError?)
+                })
                 return
             }
             self.record = rec
             self.recordId = rec.recordID
-            if let cp = completion {
-                OperationQueue.main.addOperation({ () -> Void in
-                    cp(rec, error as NSError?)
-                })
-            }
+            OperationQueue.main.addOperation({ () -> Void in
+                completion?(rec, error as NSError?)
+            })
         }
         CloudKitManager.publicDB.add(operation)
     }
@@ -265,7 +261,6 @@ open class CloudKitManager {
     
     open class func userAlreadyConnectThisDevice() -> Bool {
         return UserDefaults().bool(forKey: "userConnect")
-        //NSUserDefaults().setBool(true, forKey: "userConnect")
     }
     
     open class func availability(_ completion:@escaping (_ available:Bool, _ alert: UIAlertController?) -> Void) {
