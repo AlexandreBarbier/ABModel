@@ -20,21 +20,21 @@ open class ABModelCloudKit : ABModel {
         let keys = record.allKeys()
         let dictionary = record.dictionaryWithValues(forKeys: keys)
         super.init(dictionary: dictionary as Dictionary<String, AnyObject>)
-        self.recordId = recordId
-        self.record = record
+        recordId = recordId
+        record = record
     }
     
     public required override init() {
         let newRecord = CKRecord(recordType: type(of: self).recordType())
         super.init(dictionary: newRecord.dictionaryWithValues(forKeys: newRecord.allKeys()) as Dictionary<String, AnyObject>)
-        self.record = newRecord
-        self.recordId = newRecord.recordID
+        record = newRecord
+        recordId = newRecord.recordID
     }
     
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        self.recordId = aDecoder.decodeObject(forKey: "recordId") as! CKRecordID
-        self.record = aDecoder.decodeObject(forKey: "record") as! CKRecord
+        recordId = aDecoder.decodeObject(forKey: "recordId") as! CKRecordID
+        record = aDecoder.decodeObject(forKey: "record") as! CKRecord
     }
     
     open override func encode(with aCoder: NSCoder) {
@@ -115,8 +115,9 @@ open class ABModelCloudKit : ABModel {
     }
     
     open func saveBulk(_ records:[CKRecord],completion:(() -> Void)?) {
-        var rec = [self.toRecord()]
-        rec.append(contentsOf: records)
+        var rec = records
+        rec.append(self.toRecord())
+        
         let saveOp = CKModifyRecordsOperation(recordsToSave: rec, recordIDsToDelete: nil)
         
         saveOp.completionBlock = {
