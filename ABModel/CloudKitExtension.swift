@@ -67,21 +67,21 @@ open class ABModelCloudKit : ABModel {
         CloudKitManager.publicDB.add(operation)
     }
     
-    open class func create<T:ABModelCloudKit>(_ completion:@escaping (_ record:CKRecord?, _ error:NSError?) -> Void) -> T {
+    open class func create<T:ABModelCloudKit>(_ completion:((_ record:CKRecord?, _ error:NSError?) -> Void)? = nil) -> T {
         let obj = T()
         let operation = CKModifyRecordsOperation(recordsToSave: [obj.toRecord()], recordIDsToDelete: nil)
         operation.perRecordCompletionBlock = { (record, error) in
             guard let record = record else {
                 print("CKManager create \(error)")
                 OperationQueue.main.addOperation({ () -> Void in
-                    completion(nil, error as NSError?)
+                    completion?(nil, error as NSError?)
                 })
                 return
             }
             obj.record = record
             obj.recordId = record.recordID
             OperationQueue.main.addOperation({ () -> Void in
-                completion(record, error as NSError?)
+                completion?(record, error as NSError?)
             })
         }
         CloudKitManager.publicDB.add(operation)
@@ -111,7 +111,9 @@ open class ABModelCloudKit : ABModel {
             })
             
         }
-        CloudKitManager.publicDB.add(saveOp)
+        saveOp.database = CloudKitManager.publicDB
+        saveOp.start()
+       // CloudKitManager.publicDB.add(saveOp)
         
     }
     
@@ -155,10 +157,10 @@ open class ABModelCloudKit : ABModel {
         }
     }
     
-    open func privateSave(_ completion:@escaping (_ record:CKRecord?, _ error:Error?)-> Void) {
+    open func privateSave(_ completion:((_ record:CKRecord?, _ error:Error?)-> Void)? = nil) {
 		CloudKitManager.privateDB.save(self.toRecord(), completionHandler: { (record, error) -> Void in
             print(error)
-            completion(record, error)
+            completion?(record, error)
         }) 
     }
     
@@ -181,19 +183,19 @@ open class ABModelCloudKit : ABModel {
         return record
     }
     
-    open class func getRecord(_ predicateFormat:String, completion:@escaping (_ record:CKRecord?, _ error:NSError?) -> Void) {
+    open class func getRecord(_ predicateFormat:String, completion:((_ record:CKRecord?, _ error:NSError?) -> Void)? = nil) {
         let query = CKQuery(recordType: self.recordType(), predicate: NSPredicate(format: predicateFormat, argumentArray: nil))
         CloudKitManager.publicDB.perform(query, inZoneWith: nil) { (records, error) -> Void in
             guard let records = records, let first = records.first else {
                 OperationQueue.main.addOperation({ () -> Void in
                     print(error)
-                    completion(nil, error as NSError?)
+                    completion?(nil, error as NSError?)
                 })
                 return
             }
             OperationQueue.main.addOperation({ () -> Void in
                 print(error)
-                completion(first, error as NSError?)
+                completion?(first, error as NSError?)
             })
         }
     }
@@ -224,12 +226,12 @@ open class ABModelCloudKit : ABModel {
         if let completion = completion {
             op.fetchRecordsCompletionBlock = { (recordDictionary, error) in
                 guard let recordDictionary = recordDictionary else {
-                    print(error)
+                    print("get ref record Dico error \(error)")
                     completion([], nil)
                     return
                 }
                 guard error == nil else {
-                    print(error)
+                    print("get ref error \(error)")
                     completion([], error as? NSError)
                     return
                 }
@@ -244,7 +246,7 @@ open class ABModelCloudKit : ABModel {
         if let perRecordCompletion = perRecordCompletion {
             op.perRecordCompletionBlock = { (record, recordId, error) in
                 guard error == nil else {
-                    print(error)
+                    print("get ref error \(error)")
                     perRecordCompletion(nil, error as? NSError)
                     return
                 }
@@ -275,33 +277,33 @@ open class CloudKitManager {
         return UserDefaults().bool(forKey: "userConnect")
     }
     
-    open class func availability(_ completion:@escaping (_ available:Bool, _ alert: UIAlertController?) -> Void) {
+    open class func availability(_ completion:((_ available:Bool, _ alert: UIAlertController?) -> Void)? = nil) {
         CloudKitManager.container.accountStatus { (status, error) -> Void in
             switch status {
             case .available:
                 CloudKitManager.isAvailable = true
                 OperationQueue.main.addOperation({ () -> Void in
-                    completion(true, nil)
+                    completion?(true, nil)
                 })
                 break
             case .couldNotDetermine :
                 OperationQueue.main.addOperation({ () -> Void in
                     let alert = UIAlertController(title: "An error occured while connecting to your iCloud account", message: error!.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
-                    completion(false, alert)
+                    completion?(false, alert)
                 })
                 break
             case .noAccount:
                 CloudKitManager.isAvailable = false
                 OperationQueue.main.addOperation({ () -> Void in
                     let alert = UIAlertController(title: "iCloud account required", message: "To use this app you need to be connected to your iCloud account", preferredStyle: UIAlertControllerStyle.alert)
-                    completion(false, alert)
+                    completion?(false, alert)
                 })
                 break
             case .restricted :
                 CloudKitManager.isAvailable = false
                 OperationQueue.main.addOperation({ () -> Void in
                     let alert = UIAlertController(title: "iCloud capabilities required", message: "To use this app you need to be connected to your iCloud account and set iCloud Drive enable", preferredStyle: UIAlertControllerStyle.alert)
-                    completion(false, alert)
+                    completion?(false, alert)
                 })
                 break
             }
