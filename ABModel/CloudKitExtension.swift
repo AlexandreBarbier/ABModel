@@ -111,10 +111,7 @@ open class ABModelCloudKit : ABModel {
             })
             
         }
-        saveOp.database = CloudKitManager.publicDB
-        saveOp.start()
-       // CloudKitManager.publicDB.add(saveOp)
-        
+        CloudKitManager.publicDB.add(saveOp)
     }
     
     open func saveBulk(_ records:[CKRecord],completion:(() -> Void)?) {
@@ -127,6 +124,12 @@ open class ABModelCloudKit : ABModel {
                 completion?()
             })
         }
+        saveOp.perRecordCompletionBlock = { (record, error) in
+            guard error == nil else {
+                print("save bulk error \(error)")
+                return
+            }
+        }
         CloudKitManager.publicDB.add(saveOp)
     }
     
@@ -137,6 +140,12 @@ open class ABModelCloudKit : ABModel {
             OperationQueue.main.addOperation({ () -> Void in
                 completion?()
             })
+        }
+        saveOp.perRecordCompletionBlock = { (record, error) in
+            guard error == nil else {
+                print("save bulk error \(error)")
+                return
+            }
         }
         CloudKitManager.publicDB.add(saveOp)
     }
@@ -256,9 +265,9 @@ open class ABModelCloudKit : ABModel {
                     })
                     return
                 }
-                let project = T(record:record, recordId:recordId)
+                let object = T(record:record, recordId:recordId)
                 OperationQueue.main.addOperation({ () -> Void in
-                    perRecordCompletion(project, error as NSError?)
+                    perRecordCompletion(object, error as NSError?)
                 })
             }
         }
