@@ -94,6 +94,7 @@ open class ABModelCloudKit : ABModel {
         saveOp.perRecordCompletionBlock =  { (record, error) -> Void in
             guard let rec = record else {
                 OperationQueue.main.addOperation({ () -> Void in
+                    print(error)
                     completion?(nil, error as NSError?)
                 })
                 if let retryAfterValue = (error as? NSError)?.userInfo[CKErrorRetryAfterKey] as? TimeInterval  {
@@ -104,8 +105,8 @@ open class ABModelCloudKit : ABModel {
             }
             self.record = rec
             self.recordId = rec.recordID
-            
             OperationQueue.main.addOperation({ () -> Void in
+                print(error)
                 completion?(rec, error as NSError?)
             })
             
@@ -155,8 +156,8 @@ open class ABModelCloudKit : ABModel {
     }
     
     open func privateSave(_ completion:@escaping (_ record:CKRecord?, _ error:Error?)-> Void) {
-		
-        CloudKitManager.privateDB.save(self.toRecord(), completionHandler: { (record, error) -> Void in
+		CloudKitManager.privateDB.save(self.toRecord(), completionHandler: { (record, error) -> Void in
+            print(error)
             completion(record, error)
         }) 
     }
@@ -168,7 +169,6 @@ open class ABModelCloudKit : ABModel {
         for (key, value) in dictionary {
             
             let val = value as? CKRecordValue
-            
             if val is [CKRecordValue] {
                 if let arrayVal = val as? [CKRecordValue], arrayVal.count > 0 {
                     self.record.setObject(val, forKey: key)
@@ -186,11 +186,13 @@ open class ABModelCloudKit : ABModel {
         CloudKitManager.publicDB.perform(query, inZoneWith: nil) { (records, error) -> Void in
             guard let records = records, let first = records.first else {
                 OperationQueue.main.addOperation({ () -> Void in
+                    print(error)
                     completion(nil, error as NSError?)
                 })
                 return
             }
             OperationQueue.main.addOperation({ () -> Void in
+                print(error)
                 completion(first, error as NSError?)
             })
         }
@@ -222,10 +224,12 @@ open class ABModelCloudKit : ABModel {
         if let completion = completion {
             op.fetchRecordsCompletionBlock = { (recordDictionary, error) in
                 guard let recordDictionary = recordDictionary else {
+                    print(error)
                     completion([], nil)
                     return
                 }
                 guard error == nil else {
+                    print(error)
                     completion([], error as? NSError)
                     return
                 }
@@ -240,11 +244,11 @@ open class ABModelCloudKit : ABModel {
         if let perRecordCompletion = perRecordCompletion {
             op.perRecordCompletionBlock = { (record, recordId, error) in
                 guard error == nil else {
+                    print(error)
                     perRecordCompletion(nil, error as? NSError)
                     return
                 }
                 guard let recordId = recordId, let record = record else {
-                    
                     OperationQueue.main.addOperation({ () -> Void in
                         perRecordCompletion(nil, error as NSError?)
                     })

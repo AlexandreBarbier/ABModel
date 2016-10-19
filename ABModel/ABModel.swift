@@ -67,18 +67,15 @@ open class ABModel: NSObject, NSCoding {
         for (key, value) in dictionary {
 
             if !self.responds(to: Selector(key)) {
-               
-                    let replacementKey = self.replaceKey(key)
-                    if replacementKey.isEmpty {
-                        finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
-                        debugPrint("Forgoten key : \(key) in \(NSStringFromClass(type(of: self)))")
-                    }
-                    else {
-                        finalDictionnary[replacementKey] = value
-                        finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
-                    }
-              
-
+                let replacementKey = self.replaceKey(key)
+                if replacementKey.isEmpty {
+                    finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
+                    debugPrint("Forgoten key : \(key) in \(NSStringFromClass(type(of: self)))")
+                }
+                else {
+                    finalDictionnary[replacementKey] = value
+                    finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
+                }
             }
             if self.ignoreKey(key, value: value) {
                 finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
