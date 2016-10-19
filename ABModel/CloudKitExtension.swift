@@ -120,14 +120,20 @@ open class ABModelCloudKit : ABModel {
         
         let saveOp = CKModifyRecordsOperation(recordsToSave: rec, recordIDsToDelete: nil)
         
-//        saveOp.completionBlock = {
-//            OperationQueue.main.addOperation({ () -> Void in
-//                completion?()
-//            })
-//        }
         saveOp.modifyRecordsCompletionBlock = {(records, recordIds, error) in
-            error != nil ? print("records completion block error \(error)") : ()
-            completion?()
+            guard error == nil else {
+                
+                print("records completion block error \(error)")
+                if let error = error as? NSError, error.code == CKError.requestRateLimited.rawValue {
+                    let retryAfter = error.userInfo[CKErrorRetryAfterKey] as! NSNumber
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(retryAfter), execute: {
+                        CloudKitManager.publicDB.add(saveOp)
+                    })
+                    
+                }
+                return
+            }
         }
         saveOp.perRecordCompletionBlock = { (record, error) in
             guard error == nil else {
@@ -141,15 +147,25 @@ open class ABModelCloudKit : ABModel {
     
     open class func saveBulk(_ records:[CKRecord],completion:(() -> Void)?) {
         let saveOp = CKModifyRecordsOperation(recordsToSave: records, recordIDsToDelete: nil)
-        
-//        saveOp.completionBlock = {
-//            OperationQueue.main.addOperation({ () -> Void in
-//                completion?()
-//            })
-//        }
+    
         saveOp.modifyRecordsCompletionBlock = {(records, recordIds, error) in
-            error != nil ? print("records completion block error \(error)") : ()
-            completion?()
+            
+            guard error == nil else {
+                
+                print("records completion block error \(error)")
+                if let error = error as? NSError, error.code == CKError.requestRateLimited.rawValue {
+                    let retryAfter = error.userInfo[CKErrorRetryAfterKey] as! NSNumber
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(retryAfter), execute: {
+                        CloudKitManager.publicDB.add(saveOp)
+                    })
+                    
+                }
+                return
+            }
+            OperationQueue.main.addOperation({ () -> Void in
+                completion?()
+            })
         }
         saveOp.perRecordCompletionBlock = { (record, error) in
             
