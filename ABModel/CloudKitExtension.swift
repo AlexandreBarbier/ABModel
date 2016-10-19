@@ -20,8 +20,8 @@ open class ABModelCloudKit : ABModel {
         let keys = record.allKeys()
         let dictionary = record.dictionaryWithValues(forKeys: keys)
         super.init(dictionary: dictionary as Dictionary<String, AnyObject>)
-        recordId = recordId
-        record = record
+        self.recordId = recordId
+        self.record = record
     }
     
     public required override init() {
