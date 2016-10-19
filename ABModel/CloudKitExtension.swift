@@ -120,10 +120,14 @@ open class ABModelCloudKit : ABModel {
         
         let saveOp = CKModifyRecordsOperation(recordsToSave: rec, recordIDsToDelete: nil)
         
-        saveOp.completionBlock = {
-            OperationQueue.main.addOperation({ () -> Void in
-                completion?()
-            })
+//        saveOp.completionBlock = {
+//            OperationQueue.main.addOperation({ () -> Void in
+//                completion?()
+//            })
+//        }
+        saveOp.modifyRecordsCompletionBlock = {(records, recordIds, error) in
+            error != nil ? print("records completion block error \(error)") : ()
+            completion?()
         }
         saveOp.perRecordCompletionBlock = { (record, error) in
             guard error == nil else {
@@ -138,10 +142,14 @@ open class ABModelCloudKit : ABModel {
     open class func saveBulk(_ records:[CKRecord],completion:(() -> Void)?) {
         let saveOp = CKModifyRecordsOperation(recordsToSave: records, recordIDsToDelete: nil)
         
-        saveOp.completionBlock = {
-            OperationQueue.main.addOperation({ () -> Void in
-                completion?()
-            })
+//        saveOp.completionBlock = {
+//            OperationQueue.main.addOperation({ () -> Void in
+//                completion?()
+//            })
+//        }
+        saveOp.modifyRecordsCompletionBlock = {(records, recordIds, error) in
+            error != nil ? print("records completion block error \(error)") : ()
+            completion?()
         }
         saveOp.perRecordCompletionBlock = { (record, error) in
             
