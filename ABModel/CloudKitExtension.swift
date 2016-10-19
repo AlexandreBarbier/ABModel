@@ -52,7 +52,7 @@ open class ABModelCloudKit : ABModel {
         operation.savePolicy = .changedKeys
         operation.perRecordCompletionBlock = { (record, error) in
             guard let rec = record else {
-                print("public save \(error)")
+                error != nil ? print("public save error\(error)") : ()
                 OperationQueue.main.addOperation({ () -> Void in
                     completion?(record, error as NSError?)
                 })
@@ -94,7 +94,7 @@ open class ABModelCloudKit : ABModel {
         saveOp.perRecordCompletionBlock =  { (record, error) -> Void in
             guard let rec = record else {
                 OperationQueue.main.addOperation({ () -> Void in
-                    print(error)
+                    error != nil ? print("public save error\(error)") : ()
                     completion?(nil, error as NSError?)
                 })
                 if let retryAfterValue = (error as? NSError)?.userInfo[CKErrorRetryAfterKey] as? TimeInterval  {
@@ -106,7 +106,7 @@ open class ABModelCloudKit : ABModel {
             self.record = rec
             self.recordId = rec.recordID
             OperationQueue.main.addOperation({ () -> Void in
-                print(error)
+                error != nil ? print("public save error\(error)") : ()
                 completion?(rec, error as NSError?)
             })
             
@@ -129,6 +129,7 @@ open class ABModelCloudKit : ABModel {
                 print("save bulk error \(error)")
                 return
             }
+            print("save bulk \(record)")
         }
         CloudKitManager.publicDB.add(saveOp)
     }
@@ -142,10 +143,12 @@ open class ABModelCloudKit : ABModel {
             })
         }
         saveOp.perRecordCompletionBlock = { (record, error) in
+            
             guard error == nil else {
                 print("save bulk error \(error)")
                 return
             }
+            print("save bulk \(record)")
         }
         CloudKitManager.publicDB.add(saveOp)
     }
