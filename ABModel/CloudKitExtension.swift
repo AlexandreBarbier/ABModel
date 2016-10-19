@@ -128,7 +128,8 @@ open class ABModelCloudKit : ABModel {
                     let errorCode = CKError.Code.init(rawValue: error.code)!
                     
                     switch errorCode {
-                    case .requestRateLimited:
+                    
+                    case .zoneBusy, .requestRateLimited:
                         let retryAfter = error.userInfo[CKErrorRetryAfterKey] as! NSNumber
                         
                         DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(retryAfter), execute: {
@@ -176,7 +177,7 @@ open class ABModelCloudKit : ABModel {
                     let errorCode = CKError.Code.init(rawValue: error.code)!
                     
                     switch errorCode {
-                    case .requestRateLimited:
+                    case .zoneBusy, .requestRateLimited:
                         let retryAfter = error.userInfo[CKErrorRetryAfterKey] as! NSNumber
                         
                         DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(retryAfter), execute: {
