@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "ABModel"
-  s.version      = "0.1.2"
+  s.version      = "0.1.3"
   s.summary      = "simple class to parse REST response"
   s.description  = <<-DESC
   multiple micro lib to bootstrap ios apps"

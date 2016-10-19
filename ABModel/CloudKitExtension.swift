@@ -124,16 +124,34 @@ open class ABModelCloudKit : ABModel {
             guard error == nil else {
                 
                 print("records completion block error \(error)")
-                if let error = error as? NSError, error.code == CKError.requestRateLimited.rawValue {
-                    let retryAfter = error.userInfo[CKErrorRetryAfterKey] as! NSNumber
+                if let error = error as? NSError {
+                    let errorCode = CKError.Code.init(rawValue: error.code)!
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(retryAfter), execute: {
-                        CloudKitManager.publicDB.add(saveOp)
-                    })
-                    
+                    switch errorCode {
+                    case .requestRateLimited:
+                        let retryAfter = error.userInfo[CKErrorRetryAfterKey] as! NSNumber
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(retryAfter), execute: {
+                            CloudKitManager.publicDB.add(saveOp)
+                        })
+                        break
+                    case .partialFailure:
+                        OperationQueue.main.addOperation({ () -> Void in
+                            completion?()
+                        })
+                        break
+                    default:
+                        OperationQueue.main.addOperation({ () -> Void in
+                            completion?()
+                        })
+                        break
+                    }
                 }
                 return
             }
+            OperationQueue.main.addOperation({ () -> Void in
+                completion?()
+            })
         }
         saveOp.perRecordCompletionBlock = { (record, error) in
             guard error == nil else {
@@ -153,12 +171,27 @@ open class ABModelCloudKit : ABModel {
             guard error == nil else {
                 
                 print("records completion block error \(error)")
-                if let error = error as? NSError, error.code == CKError.requestRateLimited.rawValue {
-                    let retryAfter = error.userInfo[CKErrorRetryAfterKey] as! NSNumber
+                
+                if let error = error as? NSError {
+                    let errorCode = CKError.Code.init(rawValue: error.code)!
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(retryAfter), execute: {
-                        CloudKitManager.publicDB.add(saveOp)
-                    })
+                    switch errorCode {
+                    case .requestRateLimited:
+                        let retryAfter = error.userInfo[CKErrorRetryAfterKey] as! NSNumber
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(retryAfter), execute: {
+                            CloudKitManager.publicDB.add(saveOp)
+                        })
+                        break
+                    case .partialFailure:
+                        OperationQueue.main.addOperation({ () -> Void in
+                            completion?()
+                        })
+                        break
+                    default:
+                        break
+                    }
+                    
                     
                 }
                 return
