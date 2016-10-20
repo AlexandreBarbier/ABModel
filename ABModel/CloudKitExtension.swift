@@ -119,7 +119,7 @@ open class ABModelCloudKit : ABModel {
         rec.append(self.toRecord())
         
         let saveOp = CKModifyRecordsOperation(recordsToSave: rec, recordIDsToDelete: nil)
-        
+        saveOp.savePolicy = .allKeys
         saveOp.modifyRecordsCompletionBlock = ABModelCloudKit.mRecordCompletionBlock(saveOp: saveOp, completion: completion)
         saveOp.perRecordCompletionBlock = { (record, error) in
             guard error == nil else {
@@ -178,9 +178,9 @@ open class ABModelCloudKit : ABModel {
     
     open class func saveBulk(_ records:[CKRecord],completion:(() -> Void)?) {
         let saveOp = CKModifyRecordsOperation(recordsToSave: records, recordIDsToDelete: nil)
+        saveOp.savePolicy = .allKeys
         saveOp.modifyRecordsCompletionBlock = mRecordCompletionBlock(saveOp: saveOp, completion: completion)
         saveOp.perRecordCompletionBlock = { (record, error) in
-            
             guard error == nil else {
                 print("save bulk error \(error)")
                 return
