@@ -120,40 +120,7 @@ open class ABModelCloudKit : ABModel {
         
         let saveOp = CKModifyRecordsOperation(recordsToSave: rec, recordIDsToDelete: nil)
         
-        saveOp.modifyRecordsCompletionBlock = {(records, recordIds, error) in
-            guard error == nil else {
-                
-                print("records completion block error \(error)")
-                if let error = error as? NSError {
-                    let errorCode = CKError.Code.init(rawValue: error.code)!
-                    
-                    switch errorCode {
-                    
-                    case .zoneBusy, .requestRateLimited:
-                        let retryAfter = error.userInfo[CKErrorRetryAfterKey] as! NSNumber
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(retryAfter), execute: {
-                            CloudKitManager.publicDB.add(saveOp)
-                        })
-                        break
-                    case .partialFailure:
-                        OperationQueue.main.addOperation({ () -> Void in
-                            completion?()
-                        })
-                        break
-                    default:
-                        OperationQueue.main.addOperation({ () -> Void in
-                            completion?()
-                        })
-                        break
-                    }
-                }
-                return
-            }
-            OperationQueue.main.addOperation({ () -> Void in
-                completion?()
-            })
-        }
+        saveOp.modifyRecordsCompletionBlock = ABModelCloudKit.mRecordCompletionBlock(saveOp: saveOp, completion: completion)
         saveOp.perRecordCompletionBlock = { (record, error) in
             guard error == nil else {
                 print("save bulk error \(error)")
@@ -164,13 +131,10 @@ open class ABModelCloudKit : ABModel {
         CloudKitManager.publicDB.add(saveOp)
     }
     
-    open class func saveBulk(_ records:[CKRecord],completion:(() -> Void)?) {
-        let saveOp = CKModifyRecordsOperation(recordsToSave: records, recordIDsToDelete: nil)
     
-        saveOp.modifyRecordsCompletionBlock = {(records, recordIds, error) in
-            
+    open class func mRecordCompletionBlock(saveOp: CKModifyRecordsOperation, completion: (() -> Void)?) -> ((_ records: [CKRecord]?,_ recordsId:[CKRecordID]?,_ error : Error?) -> Void)? {
+        return { (records: [CKRecord]?, recordsId:[CKRecordID]?, error : Error?) in
             guard error == nil else {
-                
                 print("records completion block error \(error)")
                 
                 if let error = error as? NSError {
@@ -181,26 +145,40 @@ open class ABModelCloudKit : ABModel {
                         let retryAfter = error.userInfo[CKErrorRetryAfterKey] as! NSNumber
                         
                         DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(retryAfter), execute: {
-                            CloudKitManager.publicDB.add(saveOp)
+                            if !saveOp.isFinished {
+                                CloudKitManager.publicDB.add(saveOp)
+                            }
                         })
                         break
                     case .partialFailure:
+                        let itemID = error.userInfo[CKPartialErrorsByItemIDKey]
+                        print(itemID)
                         OperationQueue.main.addOperation({ () -> Void in
-                            completion?()
+                            print("partial failure \(error)")
+                            for (key, value) in itemID as! Dictionary<String, Any> {
+                                print("key : \(key),  value : \(value)")
+                            }
                         })
                         break
                     default:
+                        OperationQueue.main.addOperation({ () -> Void in
+                            print("other \(error)")
+                        })
                         break
                     }
-                    
-                    
                 }
                 return
             }
             OperationQueue.main.addOperation({ () -> Void in
                 completion?()
             })
+        
         }
+    }
+    
+    open class func saveBulk(_ records:[CKRecord],completion:(() -> Void)?) {
+        let saveOp = CKModifyRecordsOperation(recordsToSave: records, recordIDsToDelete: nil)
+        saveOp.modifyRecordsCompletionBlock = mRecordCompletionBlock(saveOp: saveOp, completion: completion)
         saveOp.perRecordCompletionBlock = { (record, error) in
             
             guard error == nil else {
