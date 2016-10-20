@@ -144,10 +144,10 @@ open class ABModel: NSObject, NSCoding {
         let children = AnyRandomAccessCollection(k.children)
         var json:Dictionary<String, AnyObject> = [:]
         for (_, value) in  (children?.enumerated())! {
-            if value.0 != "super" {
+            if let key = value.0, value.0 != "super" {
                 if let val = value.1 as? NSObject {
-					if val is String && String(describing:val) != "" {
-                        json.updateValue(val, forKey: value.0!)
+					if key != "" {
+                        json.updateValue(val, forKey: key)
                     }
                 }
             }
