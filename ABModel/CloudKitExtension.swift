@@ -155,7 +155,7 @@ open class ABModelCloudKit : ABModel {
                         print(itemID)
                         OperationQueue.main.addOperation({ () -> Void in
                             print("partial failure \(error)")
-                            for (key, value) in itemID as! Dictionary<CKRecordID, Any> {
+                            for (key, value) in itemID as! Dictionary<AnyHashable, Any> {
                                 print("key : \(key),  value : \(value)")
                             }
                         })
