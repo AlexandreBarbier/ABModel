@@ -98,7 +98,7 @@ open class ABModelCloudKit : ABModel {
                     completion?(nil, error as NSError?)
                 })
                 if let retryAfterValue = (error as? NSError)?.userInfo[CKErrorRetryAfterKey] as? TimeInterval  {
-                    debugPrint("should retry")
+                    ABModel.dPrint(value:"should retry")
                     self.perform(#selector(ABModelCloudKit.publicSave(_:)), with: nil, afterDelay:retryAfterValue)
                 }
                 return
@@ -126,7 +126,7 @@ open class ABModelCloudKit : ABModel {
                 print("save bulk error \(error)")
                 return
             }
-            print("save bulk \(record)")
+            ABModel.dPrint(value:"save bulk \(record)")
         }
         CloudKitManager.publicDB.add(saveOp)
     }
@@ -152,11 +152,13 @@ open class ABModelCloudKit : ABModel {
                         break
                     case .partialFailure:
                         let itemID = error.userInfo[CKPartialErrorsByItemIDKey]
-                        print(itemID)
+                        ABModel.dPrint(value: itemID)
                         OperationQueue.main.addOperation({ () -> Void in
                             print("partial failure \(error)")
-                            for (key, value) in itemID as! Dictionary<AnyHashable, Any> {
-                                print("key : \(key),  value : \(value)")
+                            if ABModel.debug {
+                                for (key, value) in itemID as! Dictionary<AnyHashable, Any> {
+                                    ABModel.dPrint(value:"key : \(key),  value : \(value)")
+                                }
                             }
                         })
                         break

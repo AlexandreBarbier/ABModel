@@ -17,7 +17,14 @@ import UIKit
  *
  */
 
+
+
 open class ABModel: NSObject, NSCoding {
+    static var debug:Bool = false
+    
+    class func dPrint (value: Any?) -> Void {
+        ABModel.debug ? debugPrint(value) : ()
+    }
     
     open override var description :String {
         get
