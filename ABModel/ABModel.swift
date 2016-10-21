@@ -20,7 +20,7 @@ import UIKit
 
 
 open class ABModel: NSObject, NSCoding {
-    static var debug:Bool = false
+    open static var debug:Bool = false
     
     class func dPrint (value: Any?) -> Void {
         ABModel.debug ? debugPrint(value) : ()
