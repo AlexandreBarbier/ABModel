@@ -77,7 +77,7 @@ open class ABModel: NSObject, NSCoding {
                 let replacementKey = self.replaceKey(key)
                 if replacementKey.isEmpty {
                     finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
-                    debugPrint("Forgoten key : \(key) in \(NSStringFromClass(type(of: self)))")
+                    ABModel.dPrint(value:"Forgoten key : \(key) in \(NSStringFromClass(type(of: self)))")
                 }
                 else {
                     finalDictionnary[replacementKey] = value
