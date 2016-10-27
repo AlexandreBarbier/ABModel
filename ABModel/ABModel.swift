@@ -147,7 +147,13 @@ open class ABModel: NSObject, NSCoding {
     }
     
     open func toJSON() -> Dictionary<String, AnyObject> {
-        let k = Mirror(reflecting: self)
+        var k = Mirror(reflecting: self)
+        if k.superclassMirror != nil {
+            k = k.superclassMirror!
+        }
+        else {
+            k = Mirror(reflecting: self)
+        }
         let children = AnyRandomAccessCollection(k.children)
         var json:Dictionary<String, AnyObject> = [:]
         for (_, value) in  (children?.enumerated())! {
