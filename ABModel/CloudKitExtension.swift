@@ -195,7 +195,7 @@ open class ABModelCloudKit : ABModel {
     open func refresh<T:ABModelCloudKit>(_ completion:((_ updatedObj:T?)->Void)? = nil) {
         CloudKitManager.publicDB.fetch(withRecordID: self.recordId) { (record, error) -> Void in
             guard let record = record else {
-                print(error)
+                print(error ?? "nil error")
                 OperationQueue.main.addOperation({ () -> Void in
                     completion?(nil)
                 })
@@ -210,7 +210,7 @@ open class ABModelCloudKit : ABModel {
     
     open func privateSave(_ completion:((_ record:CKRecord?, _ error:Error?)-> Void)? = nil) {
 		CloudKitManager.privateDB.save(self.toRecord(), completionHandler: { (record, error) -> Void in
-            print(error)
+            print(error ?? "nil error")
             completion?(record, error)
         }) 
     }
@@ -239,13 +239,13 @@ open class ABModelCloudKit : ABModel {
         CloudKitManager.publicDB.perform(query, inZoneWith: nil) { (records, error) -> Void in
             guard let records = records, let first = records.first else {
                 OperationQueue.main.addOperation({ () -> Void in
-                    print(error)
+                    print(error ?? "nil error")
                     completion?(nil, error as NSError?)
                 })
                 return
             }
             OperationQueue.main.addOperation({ () -> Void in
-                print(error)
+                print(error ?? "nil error")
                 completion?(first, error as NSError?)
             })
         }
@@ -254,7 +254,7 @@ open class ABModelCloudKit : ABModel {
     open func remove() {
         let deleteOp = CKModifyRecordsOperation(recordsToSave: nil, recordIDsToDelete: [self.recordId])
         deleteOp.perRecordCompletionBlock = {(record, error) in
-            print(error)
+            print(error ?? "nil error")
         }
         CloudKitManager.publicDB.add(deleteOp)
     }
@@ -262,7 +262,7 @@ open class ABModelCloudKit : ABModel {
     open class func removeRecordId(_ record:CKRecordID) {
         let deleteOp = CKModifyRecordsOperation(recordsToSave: nil, recordIDsToDelete: [record])
         deleteOp.perRecordCompletionBlock = {(record,error) in
-            print(error)
+            print(error ?? "nil error")
         }
         CloudKitManager.publicDB.add(deleteOp)
     }
