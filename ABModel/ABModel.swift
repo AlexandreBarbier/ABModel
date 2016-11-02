@@ -23,7 +23,7 @@ open class ABModel: NSObject, NSCoding {
     open static var debug:Bool = false
     
     class func dPrint (value: Any?) -> Void {
-        ABModel.debug ? debugPrint(value) : ()
+        ABModel.debug ? debugPrint(value ?? "value is nil") : ()
     }
     
     open override var description :String {
@@ -35,8 +35,10 @@ open class ABModel: NSObject, NSCoding {
     
     public required init?(coder aDecoder: NSCoder) {
         super.init()
-        let dictionary = aDecoder.decodeObject(forKey: "root") as! Dictionary<String, AnyObject>
-        var finalDictionnary =  aDecoder.decodeObject(forKey: "root") as! Dictionary<String, AnyObject>
+        guard let dictionary = aDecoder.decodeObject(forKey: "root") as? Dictionary<String, AnyObject> else {
+            return
+        }
+        var finalDictionnary = dictionary
         
         for (key, value) in dictionary {
             if !self.responds(to: Selector(key)) {
@@ -104,17 +106,15 @@ open class ABModel: NSObject, NSCoding {
             return
         }
         if (value is [AnyObject] && value is Array<Dictionary<String, AnyObject>>) {
-            var k = self.value(forKey: key) as? [ABModel]
-            
-            guard let val = k , val.count > 0 else {
+            guard var k = self.value(forKey: key) as? [ABModel] , k.count > 0 else {
                 print("\n#### FATAL ERROR ####\n key : \(key) is not initialised like this [CUSTOM_TYPE()] in \(NSStringFromClass(type(of: self)))")
                 fatalError("Error in parsing see console for more information")
             }
-            let t = type(of: val[0])
-            k!.removeAll(keepingCapacity: false)
+            let t = type(of: k[0])
+            k.removeAll(keepingCapacity: false)
             for val in value as! Array<Dictionary<String, AnyObject>> {
                 let l = t.init(dictionary: val)
-                k!.append(l)
+                k.append(l)
             }
             super.setValue(k, forKey: key)
             
