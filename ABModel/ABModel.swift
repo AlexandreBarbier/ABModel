@@ -21,7 +21,7 @@ import UIKit
 
 open class ABModel: NSObject, NSCoding {
     open static var debug:Bool = false
-    let reg = try! NSRegularExpression(pattern: "[0-9]+[a-zA-Z]+", options: NSRegularExpression.Options.caseInsensitive)
+    open static let reg = try! NSRegularExpression(pattern: "[0-9]+[a-zA-Z]+", options: NSRegularExpression.Options.caseInsensitive)
     class func dPrint (value: Any?) -> Void {
         ABModel.debug ? debugPrint(value ?? "value is nil") : ()
     }
@@ -123,7 +123,7 @@ open class ABModel: NSObject, NSCoding {
             !(self.value(forKey: key) is Dictionary<String, AnyObject>)) {
             let propAttr = property_getAttributes(class_getProperty(type(of:self), (key as NSString).utf8String!))
             let str = NSString.init(utf8String: propAttr!) as! String
-            let res = reg.matches(in: str, options: NSRegularExpression.MatchingOptions.reportCompletion, range: NSRange(location: 0, length: str.characters.count))
+            let res = ABModel.reg.matches(in: str, options: NSRegularExpression.MatchingOptions.reportCompletion, range: NSRange(location: 0, length: str.characters.count))
             let sstr = str as NSString
             var result = ""
             for (index, match) in res.enumerated() {
