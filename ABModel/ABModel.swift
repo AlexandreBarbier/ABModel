@@ -7,8 +7,8 @@
 //
 
 import UIKit
- 
- /**
+
+/**
  *
  * You just need to inherit from this class to be able to create object from JSON
  * You have to name your properties like the JSON keys or override the method replaceKey to rename a JSON key
@@ -21,7 +21,7 @@ import UIKit
 
 open class ABModel: NSObject, NSCoding {
     open static var debug:Bool = false
-    
+    let reg = try! NSRegularExpression(pattern: "[0-9]+[a-zA-Z]+", options: NSRegularExpression.Options.caseInsensitive)
     class func dPrint (value: Any?) -> Void {
         ABModel.debug ? debugPrint(value ?? "value is nil") : ()
     }
@@ -35,7 +35,7 @@ open class ABModel: NSObject, NSCoding {
     
     public required init?(coder aDecoder: NSCoder) {
         super.init()
-        guard let dictionary = aDecoder.decodeObject(forKey: "root") as? Dictionary<String, AnyObject> else {
+        guard let dictionary = aDecoder.decodeObject(forKey: "root") as? Dictionary<String, AnyObject?> else {
             return
         }
         var finalDictionnary = dictionary
@@ -52,7 +52,7 @@ open class ABModel: NSObject, NSCoding {
                     finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
                 }
             }
-            if self.ignoreKey(key, value: value) {
+            if let value = value, self.ignoreKey(key, value: value) {
                 finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
             }
             
@@ -74,7 +74,7 @@ open class ABModel: NSObject, NSCoding {
         var finalDictionnary = dictionary
         
         for (key, value) in dictionary {
-
+            
             if !self.responds(to: Selector(key)) {
                 let replacementKey = self.replaceKey(key)
                 if replacementKey.isEmpty {
@@ -96,11 +96,11 @@ open class ABModel: NSObject, NSCoding {
     override open func setValue(_ value: Any!, forKey key: String)  {
         
         /**
-        * here we want to check the type of the property named key to know if it's an array / dictionnary.
-        * if it's an array / dictionnary we have to know the objects type contain in it to make something smart
-        * if we can't find a solution here we just have to override setValue in each subclass and apply the correct treatment
-        * for nested properties
-        */
+         * here we want to check the type of the property named key to know if it's an array / dictionnary.
+         * if it's an array / dictionnary we have to know the objects type contain in it to make something smart
+         * if we can't find a solution here we just have to override setValue in each subclass and apply the correct treatment
+         * for nested properties
+         */
         //here we check if the value is nil to avoid crash
         guard value != nil else {
             return
@@ -121,11 +121,22 @@ open class ABModel: NSObject, NSCoding {
         }
         else if (value is Dictionary<String, AnyObject> &&
             !(self.value(forKey: key) is Dictionary<String, AnyObject>)) {
-                if let k = self.value(forKey: key) as? ABModel, let val = value as? Dictionary<String, AnyObject> {
-                    let t = type(of: k)
-                    let newVal = t.init(dictionary: val)
-                    super.setValue(newVal, forKey: key)
+            let propAttr = property_getAttributes(class_getProperty(type(of:self), (key as NSString).utf8String!))
+            let str = NSString.init(utf8String: propAttr!) as! String
+            let res = reg.matches(in: str, options: NSRegularExpression.MatchingOptions.reportCompletion, range: NSRange(location: 0, length: str.characters.count))
+            let sstr = str as NSString
+            var result = ""
+            for (index, match) in res.enumerated() {
+                result += sstr.substring(with: NSRange(location: match.range.location + 1, length: match.range.length - 1))
+                if index != res.count - 1 {
+                    result += "."
                 }
+            }
+            
+            if let cla = NSClassFromString(result) as? ABModel.Type, let val = value as? Dictionary<String, AnyObject> {
+                let newVal = cla.init(dictionary: val)
+                super.setValue(newVal, forKey: key)
+            }
         }
         else {
             super.setValue(value, forKey: key)
@@ -146,23 +157,20 @@ open class ABModel: NSObject, NSCoding {
         return ""
     }
     
-    open func toJSON() -> Dictionary<String, AnyObject> {
-        var json:Dictionary<String, AnyObject> = [:]
+    open func toJSON() -> Dictionary<String, AnyObject?> {
+        var json:Dictionary<String, AnyObject?> = [:]
         var k : Mirror? = Mirror(reflecting: self)
         while k != nil {
             let children = k!.children
-            for (_, value) in  children.enumerated() {
-                if let key = value.0, value.0 != "super" {
-                    if let val = value.1 as? NSObject {
-                        if key != "" {
-                            json.updateValue(val, forKey: key)
-                        }
+            for value in children.enumerated() {
+                if let key = value.element.0, value.element.0 != "super" {
+                    if let val = value.element.1 as? NSObject, key != "" {
+                        json.updateValue(val, forKey: key)
                     }
                 }
             }
             k = k!.superclassMirror
         }
-        
         return json
     }
 }
