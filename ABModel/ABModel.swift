@@ -71,7 +71,7 @@ open class ABModel: NSObject, NSCoding {
         super.init()
     }
     
-    public required init(dictionary:Dictionary<String, AnyObject?>) {
+    public required init(dictionary:Dictionary<String, AnyObject>) {
         super.init()
         var finalDictionnary = dictionary
         
@@ -86,7 +86,7 @@ open class ABModel: NSObject, NSCoding {
                     ABModel.dPrint(value:"Forgoten key : \(key) in \(type(of: self))")
                 }
             }
-            if let value = value, ignoreKey(key, value: value) {
+            if ignoreKey(key, value: value) {
                 finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
             }
         }
