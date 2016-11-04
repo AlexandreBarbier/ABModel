@@ -15,20 +15,22 @@ import UIKit
  * If you have an array<T> where T does not inherit from ABModel or is not a basic type you should use the ingnore key method and fill the array
  * yourself to avoid a memory leak caused by the casting from NSArray to Array
  *
+ * Need to cache json keys
  */
 
 
 
 open class ABModel: NSObject, NSCoding {
-    open static var debug:Bool = false
+    
+    open static var debug: Bool = false
     open static let reg = try! NSRegularExpression(pattern: "[0-9]+([a-zA-Z]+)", options: NSRegularExpression.Options.caseInsensitive)
-    static var appType = [String:AnyClass?]()
-    static var appMirror = [String:Mirror?]()
+    static var appType = [String: AnyClass?]()
+    
     class func dPrint (value: Any?) -> Void {
         ABModel.debug ? debugPrint(value ?? "value is nil") : ()
     }
     
-    open override var description :String {
+    open override var description: String {
         get
         {
             return "ABModel super class you should override this method in \(NSStringFromClass(type(of: self)))"
@@ -47,7 +49,7 @@ open class ABModel: NSObject, NSCoding {
                 let replacementKey = replaceKey(key)
                 finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
                 if !replacementKey.isEmpty {
-                    finalDictionnary[replacementKey] = value
+                    finalDictionnary.updateValue(value, forKey: replacementKey)
                 }
                 else {
                     ABModel.dPrint(value:"Forgoten key : \(key) in \(type(of: self))")
@@ -69,7 +71,7 @@ open class ABModel: NSObject, NSCoding {
         super.init()
     }
     
-    public required init(dictionary:Dictionary<String, AnyObject>) {
+    public required init(dictionary:Dictionary<String, AnyObject?>) {
         super.init()
         var finalDictionnary = dictionary
         
@@ -84,7 +86,7 @@ open class ABModel: NSObject, NSCoding {
                     ABModel.dPrint(value:"Forgoten key : \(key) in \(type(of: self))")
                 }
             }
-            if ignoreKey(key, value: value) {
+            if let value = value, ignoreKey(key, value: value) {
                 finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
             }
         }
@@ -131,13 +133,13 @@ open class ABModel: NSObject, NSCoding {
         if let cachedClass = ABModel.appType["\(type(of: self)).\(key)"] {
             return cachedClass
         }
-        let propAttr = property_getAttributes(class_getProperty(type(of:self), (key as NSString).utf8String!))
+        let propAttr = property_getAttributes(class_getProperty(type(of: self), (key as NSString).utf8String!))
         let str = NSString.init(utf8String: propAttr!)!
         let matches = ABModel.reg.matches(in: str as String, options: NSRegularExpression.MatchingOptions.reportCompletion, range: NSRange(location: 0, length: str.length))
         let result = matches.map({ (matchResult) -> String in
             return str.substring(with: matchResult.rangeAt(1))
         }).joined(separator: ".")
-        let objectClass : AnyClass? = NSClassFromString(result)
+        let objectClass: AnyClass? = NSClassFromString(result)
         ABModel.appType.updateValue(objectClass, forKey: "\(type(of: self)).\(key)")
         return objectClass
     }
@@ -145,20 +147,20 @@ open class ABModel: NSObject, NSCoding {
     /**
      * You should override this method only if you want to ignore JSON key
      */
-    open func ignoreKey(_ key:String, value:AnyObject) -> Bool {
+    open func ignoreKey(_ key: String, value: AnyObject) -> Bool {
         return false
     }
     
     /**
      * You should override this method only if you want to rename JSON key
      */
-    open func replaceKey(_ key:String) -> String {
+    open func replaceKey(_ key: String) -> String {
         return ""
     }
     
     open func toJSON() -> Dictionary<String, AnyObject?> {
-        var json:Dictionary<String, AnyObject?> = [:]
-        var k : Mirror? = Mirror(reflecting: self)
+        var json: Dictionary<String, AnyObject?> = [:]
+        var k: Mirror? = Mirror(reflecting: self)
         
         while k != nil {
             let children = k!.children
