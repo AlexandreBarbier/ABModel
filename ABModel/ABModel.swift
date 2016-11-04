@@ -21,7 +21,9 @@ import UIKit
 
 open class ABModel: NSObject, NSCoding {
     open static var debug:Bool = false
-    open static let reg = try! NSRegularExpression(pattern: "[0-9]+[a-zA-Z]+", options: NSRegularExpression.Options.caseInsensitive)
+    open static let reg = try! NSRegularExpression(pattern: "[0-9]+([a-zA-Z]+)", options: NSRegularExpression.Options.caseInsensitive)
+    static var appType = [String:AnyClass?]()
+    static var appMirror = [String:Mirror?]()
     class func dPrint (value: Any?) -> Void {
         ABModel.debug ? debugPrint(value ?? "value is nil") : ()
     }
@@ -41,27 +43,25 @@ open class ABModel: NSObject, NSCoding {
         var finalDictionnary = dictionary
         
         for (key, value) in dictionary {
-            if !self.responds(to: Selector(key)) {
-                let replacementKey = self.replaceKey(key)
-                if replacementKey.isEmpty {
-                    finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
-                    ABModel.dPrint(value:"Forgoten key : \(key) in \(NSStringFromClass(type(of: self)))")
+            if !responds(to: Selector(key)) {
+                let replacementKey = replaceKey(key)
+                finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
+                if !replacementKey.isEmpty {
+                    finalDictionnary[replacementKey] = value
                 }
                 else {
-                    finalDictionnary[replacementKey] = value;
-                    finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
+                    ABModel.dPrint(value:"Forgoten key : \(key) in \(type(of: self))")
                 }
             }
-            if let value = value, self.ignoreKey(key, value: value) {
+            if let value = value, ignoreKey(key, value: value) {
                 finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
             }
-            
         }
-        self.setValuesForKeys(finalDictionnary)
+        setValuesForKeys(finalDictionnary)
     }
     
     open func encode(with aCoder: NSCoder) {
-        let dico = self.toJSON()
+        let dico = toJSON()
         aCoder.encode(dico, forKey: "root")
     }
     
@@ -74,23 +74,21 @@ open class ABModel: NSObject, NSCoding {
         var finalDictionnary = dictionary
         
         for (key, value) in dictionary {
-            
-            if !self.responds(to: Selector(key)) {
-                let replacementKey = self.replaceKey(key)
-                if replacementKey.isEmpty {
-                    finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
-                    ABModel.dPrint(value:"Forgoten key : \(key) in \(NSStringFromClass(type(of: self)))")
+            if !responds(to: Selector(key)) {
+                let replacementKey = replaceKey(key)
+                finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
+                if !replacementKey.isEmpty {
+                    finalDictionnary[replacementKey] = value
                 }
                 else {
-                    finalDictionnary[replacementKey] = value
-                    finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
+                    ABModel.dPrint(value:"Forgoten key : \(key) in \(type(of: self))")
                 }
             }
-            if self.ignoreKey(key, value: value) {
+            if ignoreKey(key, value: value) {
                 finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
             }
         }
-        self.setValuesForKeys(finalDictionnary)
+        setValuesForKeys(finalDictionnary)
     }
     
     override open func setValue(_ value: Any!, forKey key: String)  {
@@ -105,42 +103,43 @@ open class ABModel: NSObject, NSCoding {
         guard value != nil else {
             return
         }
+        var newValue : Any! = value
+        let objectValue = self.value(forKey: key)
         if (value is [AnyObject] && value is Array<Dictionary<String, AnyObject>>) {
-            guard var k = self.value(forKey: key) as? [ABModel] , k.count > 0 else {
+            guard var newArray = objectValue as? [ABModel] , newArray.count > 0 else {
                 print("\n#### FATAL ERROR ####\n key : \(key) is not initialised like this [CUSTOM_TYPE()] in \(NSStringFromClass(type(of: self)))")
                 fatalError("Error in parsing see console for more information")
             }
-            let t = type(of: k[0])
-            k.removeAll(keepingCapacity: false)
+            let elementType = type(of: newArray[0])
+            newArray.removeAll(keepingCapacity: false)
             for val in value as! Array<Dictionary<String, AnyObject>> {
-                let l = t.init(dictionary: val)
-                k.append(l)
+                let l = elementType.init(dictionary: val)
+                newArray.append(l)
             }
-            super.setValue(k, forKey: key)
-            
+            newValue = newArray
         }
-        else if (value is Dictionary<String, AnyObject> &&
-            !(self.value(forKey: key) is Dictionary<String, AnyObject>)) {
-            let propAttr = property_getAttributes(class_getProperty(type(of:self), (key as NSString).utf8String!))
-            let str = NSString.init(utf8String: propAttr!) as! String
-            let res = ABModel.reg.matches(in: str, options: NSRegularExpression.MatchingOptions.reportCompletion, range: NSRange(location: 0, length: str.characters.count))
-            let sstr = str as NSString
-            var result = ""
-            for (index, match) in res.enumerated() {
-                result += sstr.substring(with: NSRange(location: match.range.location + 1, length: match.range.length - 1))
-                if index != res.count - 1 {
-                    result += "."
-                }
-            }
-            
-            if let cla = NSClassFromString(result) as? ABModel.Type, let val = value as? Dictionary<String, AnyObject> {
-                let newVal = cla.init(dictionary: val)
-                super.setValue(newVal, forKey: key)
+        else if (value is Dictionary<String, AnyObject> && !(objectValue is Dictionary<String, AnyObject>)) {
+            if  let objectType = getAttributeType(for:key) as? ABModel.Type,
+                let objectValue = value as? Dictionary<String, AnyObject> {
+                newValue = objectType.init(dictionary: objectValue)
             }
         }
-        else {
-            super.setValue(value, forKey: key)
+        super.setValue(newValue, forKey: key)
+    }
+    
+    func getAttributeType(for key: String) -> AnyClass? {
+        if let cachedClass = ABModel.appType["\(type(of: self)).\(key)"] {
+            return cachedClass
         }
+        let propAttr = property_getAttributes(class_getProperty(type(of:self), (key as NSString).utf8String!))
+        let str = NSString.init(utf8String: propAttr!)!
+        let matches = ABModel.reg.matches(in: str as String, options: NSRegularExpression.MatchingOptions.reportCompletion, range: NSRange(location: 0, length: str.length))
+        let result = matches.map({ (matchResult) -> String in
+            return str.substring(with: matchResult.rangeAt(1))
+        }).joined(separator: ".")
+        let objectClass : AnyClass? = NSClassFromString(result)
+        ABModel.appType.updateValue(objectClass, forKey: "\(type(of: self)).\(key)")
+        return objectClass
     }
     
     /**
@@ -160,11 +159,12 @@ open class ABModel: NSObject, NSCoding {
     open func toJSON() -> Dictionary<String, AnyObject?> {
         var json:Dictionary<String, AnyObject?> = [:]
         var k : Mirror? = Mirror(reflecting: self)
+        
         while k != nil {
             let children = k!.children
             for value in children.enumerated() {
-                if let key = value.element.0, value.element.0 != "super" {
-                    if let val = value.element.1 as? NSObject, key != "" {
+                if let key = value.element.0, key != "super", key != "" {
+                    if let val = value.element.1 as? NSObject {
                         json.updateValue(val, forKey: key)
                     }
                 }
