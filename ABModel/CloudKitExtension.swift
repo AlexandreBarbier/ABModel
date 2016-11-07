@@ -70,6 +70,7 @@ open class ABModelCloudKit : ABModel {
     open class func create<T:ABModelCloudKit>(_ completion:((_ record:CKRecord?, _ error:NSError?) -> Void)? = nil) -> T {
         let obj = T()
         let operation = CKModifyRecordsOperation(recordsToSave: [obj.toRecord()], recordIDsToDelete: nil)
+        
         operation.perRecordCompletionBlock = { (record, error) in
             guard let record = record else {
                 print("CKManager create \(error)")
@@ -179,16 +180,18 @@ open class ABModelCloudKit : ABModel {
     }
     
     open class func saveBulk(_ records:[CKRecord],completion:(() -> Void)?) {
-        let saveOp = CKModifyRecordsOperation(recordsToSave: records, recordIDsToDelete: nil)
-        saveOp.savePolicy = .allKeys
-        saveOp.modifyRecordsCompletionBlock = mRecordCompletionBlock(saveOp: saveOp, completion: completion)
-        saveOp.perRecordCompletionBlock = { (record, error) in
-            guard error == nil else {
-                print("save bulk error \(error)")
-                return
+        let saveOp : CKModifyRecordsOperation = {
+            $0.savePolicy = .allKeys
+            $0.modifyRecordsCompletionBlock = mRecordCompletionBlock(saveOp: $0, completion: completion)
+            $0.perRecordCompletionBlock = { (record, error) in
+                guard error == nil else {
+                    print("save bulk error \(error)")
+                    return
+                }
+                ABModel.dPrint(value: "save bulk \(record)")
             }
-            print("save bulk \(record)")
-        }
+            return $0
+        }(CKModifyRecordsOperation(recordsToSave: records, recordIDsToDelete: nil))
         CloudKitManager.publicDB.add(saveOp)
     }
     
@@ -308,6 +311,7 @@ open class ABModelCloudKit : ABModel {
                     return
                 }
                 let object = T(record:record, recordId:recordId)
+                
                 OperationQueue.main.addOperation({ () -> Void in
                     perRecordCompletion(object, error as NSError?)
                 })
@@ -322,8 +326,7 @@ open class CloudKitManager {
     open static var publicDB = CloudKitManager.container.publicCloudDatabase
     open static var privateDB = CloudKitManager.container.privateCloudDatabase
     open static var isAvailable : Bool = false
-    open static var cloudkitQueue = OperationQueue()
-    
+        
     open class func userAlreadyConnectThisDevice() -> Bool {
         return UserDefaults().bool(forKey: "userConnect")
     }
