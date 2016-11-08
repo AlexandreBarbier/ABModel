@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 abarbier. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 //! Project version number for ABModel.
 FOUNDATION_EXPORT double ABModelVersionNumber;

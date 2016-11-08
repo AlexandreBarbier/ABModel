@@ -6,19 +6,14 @@
 //  Copyright (c) 2014 abarbier. All rights reserved.
 //
 
-import UIKit
-
 /**
  *
  * You just need to inherit from this class to be able to create object from JSON
  * You have to name your properties like the JSON keys or override the method replaceKey to rename a JSON key
- * If you have an array<T> where T does not inherit from ABModel or is not a basic type you should use the ingnore key method and fill the array
+ * If you have an array<T> where T does not inherit from ABModel or is not a basic type you should use the ignore key method and fill the array
  * yourself to avoid a memory leak caused by the casting from NSArray to Array
  *
- * Need to cache json keys
  */
-
-
 
 open class ABModel: NSObject, NSCoding {
     
@@ -27,10 +22,6 @@ open class ABModel: NSObject, NSCoding {
     
     static var appType = [String: AnyClass?]()
     static var mirrorKeys = [String:[String]]()
-    
-    class func dPrint (value: Any?) -> Void {
-        ABModel.debug ? debugPrint(value ?? "value is nil") : ()
-    }
     
     open override var description: String {
         get
@@ -61,6 +52,53 @@ open class ABModel: NSObject, NSCoding {
         parse(dictionary: dictionary)
     }
     
+}
+
+// MARK: - override this if needed
+extension ABModel {
+    /**
+     * You should override this method only if you want to ignore JSON key
+     */
+    open func ignoreKey(_ key: String, value: AnyObject) -> Bool {
+        return false
+    }
+    
+    /**
+     * You should override this method only if you want to rename JSON key
+     */
+    open func replaceKey(_ key: String) -> String {
+        return ""
+    }
+}
+
+// MARK: - Helper
+extension ABModel {
+    
+    class func dPrint (value: Any?) -> Void {
+        ABModel.debug ? debugPrint(value ?? "value is nil") : ()
+    }
+    
+    open func toJSON() -> Dictionary<String, AnyObject?> {
+        var json: Dictionary<String, AnyObject?> = [:]
+        var k: Mirror? = Mirror(reflecting: self)
+        
+        while k != nil {
+            let children = k!.children
+            for value in children.enumerated() {
+                if let key = value.element.0, key != "super", key != "" {
+                    if let val = value.element.1 as? NSObject {
+                        json.updateValue(val, forKey: key)
+                    }
+                }
+            }
+            k = k!.superclassMirror
+        }
+        return json
+    }
+}
+
+// MARK: - parsing
+extension ABModel {
     func parse(dictionary:Dictionary<String, AnyObject?>) {
         
         var finalDictionnary = dictionary
@@ -81,39 +119,9 @@ open class ABModel: NSObject, NSCoding {
             }
         }
         setValuesForKeys(finalDictionnary)
-        let keys:[String]
-        if let k = ABModel.mirrorKeys["\(type(of: self))"] {
-            keys = k
-        }
-        else {
-            var mkeys : Mirror? = Mirror(reflecting: self)
-            var k : [String] = []
-            while mkeys != nil {
-                let children = mkeys!.children
-                for value in children.enumerated() {
-                    if let key = value.element.0, key != "super", key != "" {
-                        k.append(key)
-                    }
-                }
-                mkeys = mkeys!.superclassMirror
-            }
-            ABModel.mirrorKeys.updateValue(k, forKey: "\(type(of: self))")
-            keys = k
-        }
-        for key in keys {
-            if finalDictionnary.contains(where: { (k: String, value: AnyObject?) -> Bool in
-                return key == k
-            }) {
-                continue
-            }
-            if responds(to: Selector(key)) {
-                let objectValue = self.value(forKey: key) as? AnyObject
-                if objectValue is [ABModel] {
-                    self.setValue([], forKey: key)
-                }
-            }
-        }
+        cleanModel(dictionnary: finalDictionnary)
     }
+    
     
     override open func setValue(_ value: Any!, forKey key: String)  {
         
@@ -132,7 +140,7 @@ open class ABModel: NSObject, NSCoding {
             return
         }
         var newValue : Any! = value
-        let objectValue = self.value(forKey: key) as? AnyObject
+        let objectValue = self.value(forKey: key)
         if (value is [AnyObject] && value is Array<Dictionary<String, AnyObject>>) {
             guard var newArray = objectValue as? [ABModel] , newArray.count > 0 else {
                 print("\n#### FATAL ERROR ####\n key : \(key) is not initialised like this [CUSTOM_TYPE()] in \(NSStringFromClass(type(of: self)))")
@@ -154,6 +162,10 @@ open class ABModel: NSObject, NSCoding {
         }
         super.setValue(newValue, forKey: key)
     }
+}
+
+// MARK: - private
+extension ABModel {
     
     func applyRegex(str:NSString) -> String {
         let matches = ABModel.reg.matches(in: str as String, options: NSRegularExpression.MatchingOptions.reportCompletion, range: NSRange(location: 0, length: str.length))
@@ -175,35 +187,38 @@ open class ABModel: NSObject, NSCoding {
         return objectClass
     }
     
-    /**
-     * You should override this method only if you want to ignore JSON key
-     */
-    open func ignoreKey(_ key: String, value: AnyObject) -> Bool {
-        return false
-    }
-    
-    /**
-     * You should override this method only if you want to rename JSON key
-     */
-    open func replaceKey(_ key: String) -> String {
-        return ""
-    }
-    
-    open func toJSON() -> Dictionary<String, AnyObject?> {
-        var json: Dictionary<String, AnyObject?> = [:]
-        var k: Mirror? = Mirror(reflecting: self)
-        
-        while k != nil {
-            let children = k!.children
-            for value in children.enumerated() {
-                if let key = value.element.0, key != "super", key != "" {
-                    if let val = value.element.1 as? NSObject {
-                        json.updateValue(val, forKey: key)
+    func cleanModel(dictionnary:Dictionary<String, AnyObject?>) {
+        let keys:[String]
+        if let k = ABModel.mirrorKeys["\(type(of: self))"] {
+            keys = k
+        }
+        else {
+            var mkeys : Mirror? = Mirror(reflecting: self)
+            var k : [String] = []
+            while mkeys != nil {
+                let children = mkeys!.children
+                for value in children.enumerated() {
+                    if let key = value.element.0, key != "super", key != "" {
+                        k.append(key)
                     }
                 }
+                mkeys = mkeys!.superclassMirror
             }
-            k = k!.superclassMirror
+            ABModel.mirrorKeys.updateValue(k, forKey: "\(type(of: self))")
+            keys = k
         }
-        return json
+        for key in keys {
+            if dictionnary.contains(where: { (k: String, value: AnyObject?) -> Bool in
+                return key == k
+            }) {
+                continue
+            }
+            if responds(to: Selector(key)) {
+                let objectValue = self.value(forKey: key)
+                if objectValue is [ABModel] {
+                    self.setValue([], forKey: key)
+                }
+            }
+        }
     }
 }
