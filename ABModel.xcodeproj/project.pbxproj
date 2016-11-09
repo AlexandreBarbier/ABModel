@@ -52,8 +52,6 @@
 			isa = PBXGroup;
 			children = (
 				8DB533E01AFFEB74008C2078 /* NSDataJSON.swift */,
-				8D8A5B261DD33B25000B8BAB /* Reflection.h */,
-				8D8A5B271DD33B25000B8BAB /* Reflection.m */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -80,6 +78,8 @@
 			isa = PBXGroup;
 			children = (
 				AC3E690819B4C84500681A5A /* ABModel.h */,
+				8D8A5B261DD33B25000B8BAB /* Reflection.h */,
+				8D8A5B271DD33B25000B8BAB /* Reflection.m */,
 				AC3E692519B4C86700681A5A /* ABModel.swift */,
 				8DEF87CE1D1301FF00DF5D27 /* CloudKitExtension.swift */,
 				8DB533DF1AFFEB2E008C2078 /* Helpers */,
