@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8D8A5B281DD33B25000B8BAB /* Reflection.h in Headers */ = {isa = PBXBuildFile; fileRef = 8D8A5B261DD33B25000B8BAB /* Reflection.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8D8A5B291DD33B25000B8BAB /* Reflection.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D8A5B271DD33B25000B8BAB /* Reflection.m */; };
 		8DB533E11AFFEB74008C2078 /* NSDataJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB533E01AFFEB74008C2078 /* NSDataJSON.swift */; };
 		8DEF87CF1D1301FF00DF5D27 /* CloudKitExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DEF87CE1D1301FF00DF5D27 /* CloudKitExtension.swift */; };
 		AC3E690919B4C84500681A5A /* ABModel.h in Headers */ = {isa = PBXBuildFile; fileRef = AC3E690819B4C84500681A5A /* ABModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -15,6 +17,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8D8A5B261DD33B25000B8BAB /* Reflection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reflection.h; sourceTree = "<group>"; };
+		8D8A5B271DD33B25000B8BAB /* Reflection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reflection.m; sourceTree = "<group>"; };
 		8DB533E01AFFEB74008C2078 /* NSDataJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSDataJSON.swift; sourceTree = "<group>"; };
 		8DEF87CE1D1301FF00DF5D27 /* CloudKitExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitExtension.swift; sourceTree = "<group>"; };
 		AC3E690319B4C84500681A5A /* ABModel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ABModel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -48,6 +52,8 @@
 			isa = PBXGroup;
 			children = (
 				8DB533E01AFFEB74008C2078 /* NSDataJSON.swift */,
+				8D8A5B261DD33B25000B8BAB /* Reflection.h */,
+				8D8A5B271DD33B25000B8BAB /* Reflection.m */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -115,6 +121,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AC3E690919B4C84500681A5A /* ABModel.h in Headers */,
+				8D8A5B281DD33B25000B8BAB /* Reflection.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -169,7 +176,7 @@
 					AC3E690219B4C84500681A5A = {
 						CreatedOnToolsVersion = 6.0;
 						DevelopmentTeam = GSBM8D97ZM;
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 0810;
 						ProvisioningStyle = Automatic;
 					};
 					AC3E690D19B4C84500681A5A = {
@@ -219,6 +226,7 @@
 			files = (
 				8DEF87CF1D1301FF00DF5D27 /* CloudKitExtension.swift in Sources */,
 				8DB533E11AFFEB74008C2078 /* NSDataJSON.swift in Sources */,
+				8D8A5B291DD33B25000B8BAB /* Reflection.m in Sources */,
 				AC3E692619B4C86700681A5A /* ABModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -279,6 +287,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = ABModel;
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -323,6 +332,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = ABModel;
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -353,6 +363,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
@@ -379,6 +390,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;

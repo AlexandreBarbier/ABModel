@@ -32,6 +32,7 @@ open class ABModel: NSObject, NSCoding {
     
     public required init?(coder aDecoder: NSCoder) {
         super.init()
+        
         guard let dictionary = aDecoder.decodeObject(forKey: "root") as? Dictionary<String, AnyObject?> else {
             return
         }
@@ -49,6 +50,7 @@ open class ABModel: NSObject, NSCoding {
     
     public required init(dictionary:Dictionary<String, AnyObject>) {
         super.init()
+        
         parse(dictionary: dictionary)
     }
     
@@ -80,18 +82,12 @@ extension ABModel {
     
     open func toJSON() -> Dictionary<String, AnyObject?> {
         var json: Dictionary<String, AnyObject?> = [:]
-        var k: Mirror? = Mirror(reflecting: self)
+        let keys:[String] = fillMirrorKeys()
         
-        while k != nil {
-            let children = k!.children
-            for value in children.enumerated() {
-                if let key = value.element.0, key != "super", key != "" {
-                    if let val = value.element.1 as? NSObject {
-                        json.updateValue(val, forKey: key)
-                    }
-                }
+        for key in keys {
+            if responds(to: Selector(key)), let value = self.value(forKey: key) as? NSObject {
+                json.updateValue(value, forKey: key)
             }
-            k = k!.superclassMirror
         }
         return json
     }
@@ -142,6 +138,9 @@ extension ABModel {
         var newValue : Any! = value
         let objectValue = self.value(forKey: key)
         if (value is [AnyObject] && value is Array<Dictionary<String, AnyObject>>) {
+            let k = class_getInstanceVariable(type(of:self), key)
+            let t = Reflection().getTypeOf(k)!
+            print(t)
             guard var newArray = objectValue as? [ABModel] , newArray.count > 0 else {
                 print("\n#### FATAL ERROR ####\n key : \(key) is not initialised like this [CUSTOM_TYPE()] in \(NSStringFromClass(type(of: self)))")
                 fatalError("Error in parsing see console for more information")
@@ -187,7 +186,7 @@ extension ABModel {
         return objectClass
     }
     
-    func cleanModel(dictionnary:Dictionary<String, AnyObject?>) {
+    func fillMirrorKeys() -> [String] {
         let keys:[String]
         if let k = ABModel.mirrorKeys["\(type(of: self))"] {
             keys = k
@@ -198,7 +197,7 @@ extension ABModel {
             while mkeys != nil {
                 let children = mkeys!.children
                 for value in children.enumerated() {
-                    if let key = value.element.0, key != "super", key != "" {
+                    if let key = value.element.0, key != "super", key != "", responds(to: Selector(key)) {
                         k.append(key)
                     }
                 }
@@ -207,6 +206,11 @@ extension ABModel {
             ABModel.mirrorKeys.updateValue(k, forKey: "\(type(of: self))")
             keys = k
         }
+        return keys
+    }
+    
+    func cleanModel(dictionnary:Dictionary<String, AnyObject?>) {
+        let keys:[String] = fillMirrorKeys()
         for key in keys {
             if dictionnary.contains(where: { (k: String, value: AnyObject?) -> Bool in
                 return key == k
