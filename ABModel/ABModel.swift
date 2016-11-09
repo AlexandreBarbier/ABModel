@@ -15,8 +15,6 @@
  *
  */
 
-import ABModel.Reflection
-
 open class ABModel: NSObject, NSCoding {
     
     open static var debug: Bool = false
