@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8D85418B1DD37A4E0020BD15 /* Reflection.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D8A5B271DD33B25000B8BAB /* Reflection.m */; };
 		8D8A5B281DD33B25000B8BAB /* Reflection.h in Headers */ = {isa = PBXBuildFile; fileRef = 8D8A5B261DD33B25000B8BAB /* Reflection.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8D8A5B291DD33B25000B8BAB /* Reflection.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D8A5B271DD33B25000B8BAB /* Reflection.m */; };
 		8DB533E11AFFEB74008C2078 /* NSDataJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB533E01AFFEB74008C2078 /* NSDataJSON.swift */; };
 		8DEF87CF1D1301FF00DF5D27 /* CloudKitExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DEF87CE1D1301FF00DF5D27 /* CloudKitExtension.swift */; };
 		AC3E690919B4C84500681A5A /* ABModel.h in Headers */ = {isa = PBXBuildFile; fileRef = AC3E690819B4C84500681A5A /* ABModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -226,7 +226,7 @@
 			files = (
 				8DEF87CF1D1301FF00DF5D27 /* CloudKitExtension.swift in Sources */,
 				8DB533E11AFFEB74008C2078 /* NSDataJSON.swift in Sources */,
-				8D8A5B291DD33B25000B8BAB /* Reflection.m in Sources */,
+				8D85418B1DD37A4E0020BD15 /* Reflection.m in Sources */,
 				AC3E692619B4C86700681A5A /* ABModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -265,6 +265,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -318,6 +319,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
