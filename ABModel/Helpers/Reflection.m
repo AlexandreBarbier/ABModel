@@ -10,11 +10,7 @@
 
 @implementation Reflection
 
-- (NSString *)getString {
-    return @"lkasfijocansi";
-}
-
-- (Class) getTypeOf:(id)var {
++ (Class) getTypeOf:(id)var {
     return NSClassFromString([NSString stringWithCString:ivar_getTypeEncoding((__bridge Ivar)(var)) encoding:NSUTF8StringEncoding]);
 }
 

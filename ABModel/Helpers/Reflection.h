@@ -9,5 +9,5 @@
 #import <Foundation/Foundation.h>
 
 @interface Reflection : NSObject
-- (Class) getTypeOf:(id)var;
++ (Class) getTypeOf:(id)var;
 @end

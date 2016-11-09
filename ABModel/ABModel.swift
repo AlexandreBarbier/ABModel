@@ -139,7 +139,7 @@ extension ABModel {
         let objectValue = self.value(forKey: key)
         if (value is [AnyObject] && value is Array<Dictionary<String, AnyObject>>) {
             let k = class_getInstanceVariable(type(of:self), key)
-            let t = Reflection().getTypeOf(k)
+            let t = Reflection.getTypeOf(k)
             print(t ?? "test")
             guard var newArray = objectValue as? [ABModel] , newArray.count > 0 else {
                 print("\n#### FATAL ERROR ####\n key : \(key) is not initialised like this [CUSTOM_TYPE()] in \(NSStringFromClass(type(of: self)))")
