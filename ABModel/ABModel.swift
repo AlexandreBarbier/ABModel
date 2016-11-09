@@ -15,7 +15,7 @@
  *
  */
 
-import Reflection
+import ABModel.Reflection
 
 open class ABModel: NSObject, NSCoding {
     
