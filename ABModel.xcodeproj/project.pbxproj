@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		8DB533E11AFFEB74008C2078 /* NSDataJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB533E01AFFEB74008C2078 /* NSDataJSON.swift */; };
+		8DC930F61DD4B42100678A50 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC930F51DD4B42100678A50 /* CloudKit.framework */; };
+		8DC930F71DD4B44D00678A50 /* ABModel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC3E690319B4C84500681A5A /* ABModel.framework */; };
+		8DC9310C1DD4C11E00678A50 /* TestsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DC9310B1DD4C11E00678A50 /* TestsModels.swift */; };
 		8DEF87CF1D1301FF00DF5D27 /* CloudKitExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DEF87CE1D1301FF00DF5D27 /* CloudKitExtension.swift */; };
 		AC3E690919B4C84500681A5A /* ABModel.h in Headers */ = {isa = PBXBuildFile; fileRef = AC3E690819B4C84500681A5A /* ABModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AC3E691319B4C84500681A5A /* ABModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3E691219B4C84500681A5A /* ABModelTests.swift */; };
@@ -16,6 +19,8 @@
 
 /* Begin PBXFileReference section */
 		8DB533E01AFFEB74008C2078 /* NSDataJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSDataJSON.swift; sourceTree = "<group>"; };
+		8DC930F51DD4B42100678A50 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		8DC9310B1DD4C11E00678A50 /* TestsModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestsModels.swift; sourceTree = "<group>"; };
 		8DEF87CE1D1301FF00DF5D27 /* CloudKitExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitExtension.swift; sourceTree = "<group>"; };
 		AC3E690319B4C84500681A5A /* ABModel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ABModel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC3E690719B4C84500681A5A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -38,12 +43,22 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8DC930F71DD4B44D00678A50 /* ABModel.framework in Frameworks */,
+				8DC930F61DD4B42100678A50 /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8D5BD52B1DD47C1800D1D9A1 /* testModel */ = {
+			isa = PBXGroup;
+			children = (
+				8DC9310B1DD4C11E00678A50 /* TestsModels.swift */,
+			);
+			path = testModel;
+			sourceTree = "<group>";
+		};
 		8DB533DF1AFFEB2E008C2078 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
@@ -52,12 +67,21 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
+		8DC930F41DD4B42100678A50 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8DC930F51DD4B42100678A50 /* CloudKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		AC3E68F919B4C84500681A5A = {
 			isa = PBXGroup;
 			children = (
 				AC3E690519B4C84500681A5A /* ABModel */,
 				AC3E690F19B4C84500681A5A /* ABModelTests */,
 				AC3E690419B4C84500681A5A /* Products */,
+				8DC930F41DD4B42100678A50 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -93,6 +117,7 @@
 		AC3E690F19B4C84500681A5A /* ABModelTests */ = {
 			isa = PBXGroup;
 			children = (
+				8D5BD52B1DD47C1800D1D9A1 /* testModel */,
 				AC3E691219B4C84500681A5A /* ABModelTests.swift */,
 				AC3E691019B4C84500681A5A /* Supporting Files */,
 			);
@@ -162,6 +187,9 @@
 		AC3E68FA19B4C84500681A5A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				KnownAssetTags = (
+					New,
+				);
 				LastSwiftUpdateCheck = 0700;
 				LastUpgradeCheck = 0810;
 				ORGANIZATIONNAME = abarbier;
@@ -174,6 +202,8 @@
 					};
 					AC3E690D19B4C84500681A5A = {
 						CreatedOnToolsVersion = 6.0;
+						DevelopmentTeam = GSBM8D97ZM;
+						LastSwiftMigration = 0810;
 					};
 				};
 			};
@@ -227,6 +257,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8DC9310C1DD4C11E00678A50 /* TestsModels.swift in Sources */,
 				AC3E691319B4C84500681A5A /* ABModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -278,7 +309,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = ABModel;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
@@ -325,7 +356,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = ABModel;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
@@ -394,6 +425,7 @@
 		AC3E691A19B4C84500681A5A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DEVELOPMENT_TEAM = GSBM8D97ZM;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -406,12 +438,14 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.abarbier.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
 		AC3E691B19B4C84500681A5A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DEVELOPMENT_TEAM = GSBM8D97ZM;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -420,6 +454,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.abarbier.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

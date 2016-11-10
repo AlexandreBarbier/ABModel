@@ -180,6 +180,8 @@ extension ABModel {
         let result = applyRegex(str: str)
         let objectClass: AnyClass? = NSClassFromString(result)
         ABModel.appType.updateValue(objectClass, forKey: "\(type(of: self)).\(key)")
+        
+
         return objectClass
     }
     

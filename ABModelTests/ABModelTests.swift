@@ -8,6 +8,7 @@
 
 import UIKit
 import XCTest
+import ABModel
 
 class ABModelTests: XCTestCase {
     
@@ -21,16 +22,32 @@ class ABModelTests: XCTestCase {
         super.tearDown()
     }
     
-    func testExample() {
-        // This is an example of a functional test case.
-        XCTAssert(true, "Pass")
+    func testStringParsing() {
+        let dico = ["first": "one" as AnyObject, "second": "two" as AnyObject, "third": "three" as AnyObject]
+        let object = StringModel(dictionary: dico)
+        XCTAssert(object.first == "one")
+        XCTAssert(object.second == "two")
+        XCTAssert(object.third == "three")
+    }
+    
+    func testArrayParsing() {
+        let dico = ["stringArray": ["one", "two", "three"] as AnyObject, "intArray": [1,2,3] as AnyObject, "floatArray":[Float(1.0),Float(1.99)] as AnyObject]
+        let object = ArrayModel(dictionary: dico)
+        XCTAssert(object.stringArray!.first == "one")
+        XCTAssert(object.intArray!.first == 1)
+        XCTAssert(object.floatArray!.first == Float(1.0))
+    }
+    
+    func testArrayParsing() {
+        let dico = ["stringArray": ["one", "two", "three"] as AnyObject, "intArray": [1,2,3] as AnyObject, "floatArray":[Float(1.0),Float(1.99)] as AnyObject]
+        let object = ArrayModel(dictionary: dico)
+        XCTAssert(object.stringArray!.first == "one")
+        XCTAssert(object.intArray!.first == 1)
+        XCTAssert(object.floatArray!.first == Float(1.0))
     }
     
     func testPerformanceExample() {
         // This is an example of a performance test case.
-        self.measureBlock() {
-            // Put the code you want to measure the time of here.
-        }
+        
     }
-    
 }
