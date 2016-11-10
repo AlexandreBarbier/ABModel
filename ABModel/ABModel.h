@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <ABModel/Reflection.h>
+
 //! Project version number for ABModel.
 FOUNDATION_EXPORT double ABModelVersionNumber;
 
@@ -15,5 +15,3 @@ FOUNDATION_EXPORT double ABModelVersionNumber;
 FOUNDATION_EXPORT const unsigned char ABModelVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <ABModel/PublicHeader.h>
-
-
