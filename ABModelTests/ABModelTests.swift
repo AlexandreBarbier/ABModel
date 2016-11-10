@@ -11,6 +11,8 @@ import XCTest
 import ABModel
 
 class ABModelTests: XCTestCase {
+    let stringBaseDico = ["first": "one" as AnyObject, "second": "two" as AnyObject, "third": "three" as AnyObject]
+    let arrayBaseDico = ["stringArray": ["one", "two", "three"] as AnyObject, "intArray": [1, 2, 3] as AnyObject, "floatArray":[Float(1.0),Float(1.99)] as AnyObject]
     
     override func setUp() {
         super.setUp()
@@ -23,31 +25,49 @@ class ABModelTests: XCTestCase {
     }
     
     func testStringParsing() {
-        let dico = ["first": "one" as AnyObject, "second": "two" as AnyObject, "third": "three" as AnyObject]
-        let object = StringModel(dictionary: dico)
+        let object = StringModel(dictionary: stringBaseDico)
+        
         XCTAssert(object.first == "one")
         XCTAssert(object.second == "two")
         XCTAssert(object.third == "three")
     }
     
     func testArrayParsing() {
-        let dico = ["stringArray": ["one", "two", "three"] as AnyObject, "intArray": [1,2,3] as AnyObject, "floatArray":[Float(1.0),Float(1.99)] as AnyObject]
-        let object = ArrayModel(dictionary: dico)
+        
+        let object = ArrayModel(dictionary: arrayBaseDico)
+        
         XCTAssert(object.stringArray!.first == "one")
         XCTAssert(object.intArray!.first == 1)
         XCTAssert(object.floatArray!.first == Float(1.0))
     }
     
-    func testArrayParsing() {
-        let dico = ["stringArray": ["one", "two", "three"] as AnyObject, "intArray": [1,2,3] as AnyObject, "floatArray":[Float(1.0),Float(1.99)] as AnyObject]
-        let object = ArrayModel(dictionary: dico)
-        XCTAssert(object.stringArray!.first == "one")
-        XCTAssert(object.intArray!.first == 1)
-        XCTAssert(object.floatArray!.first == Float(1.0))
+    func testCustomParsing() {
+        
+        let dico = ["array": arrayBaseDico as AnyObject, "str": stringBaseDico as AnyObject]
+        let object = CustomTypeModel(dictionary: dico)
+        
+        XCTAssert(object.array!.stringArray!.first == "one")
+        XCTAssert(object.array!.intArray!.first == 1)
+        XCTAssert(object.array!.floatArray!.first == Float(1.0))
+        XCTAssert(object.str!.first == "one")
+        XCTAssert(object.str!.second == "two")
+        XCTAssert(object.str!.third == "three")
     }
+    
+    
     
     func testPerformanceExample() {
-        // This is an example of a performance test case.
+        let baseDico = ["array": arrayBaseDico as AnyObject, "str": stringBaseDico as AnyObject]
+        let hugeDico = Array(repeating: baseDico, count: 1000)
+        var resultArray: [CustomTypeModel] = []
+        measure {
+            resultArray.removeAll()
+            for dico in hugeDico {
+                resultArray.append(CustomTypeModel(dictionary: dico))
+            }
+        }
+        
+        XCTAssert(resultArray.count == 1000)
         
     }
 }

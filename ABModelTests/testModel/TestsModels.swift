@@ -20,3 +20,9 @@ class ArrayModel: ABModel {
     var intArray: [Int]?
     var floatArray: [Float]?
 }
+
+
+class CustomTypeModel: ABModel {
+    var array: ArrayModel?
+    var str: StringModel?
+}
