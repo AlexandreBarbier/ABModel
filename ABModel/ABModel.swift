@@ -219,7 +219,7 @@ extension ABModel {
             if responds(to: Selector(key)) {
                 let objectValue = self.value(forKey: key)
                 if objectValue is [ABModel] {
-                    self.setValue([], forKey: key)
+                    super.setValue([], forKey: key)
                 }
             }
         }
