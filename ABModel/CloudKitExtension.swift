@@ -143,10 +143,13 @@ open class ABModelCloudKit : ABModel {
                     switch errorCode {
                     case .zoneBusy, .requestRateLimited:
                         let retryAfter = error.userInfo[CKErrorRetryAfterKey] as! NSNumber
-                        
+                        let retrySave = CKModifyRecordsOperation(recordsToSave: saveOp.recordsToSave, recordIDsToDelete: saveOp.recordIDsToDelete)
+                        retrySave.perRecordCompletionBlock = saveOp.perRecordCompletionBlock
+                        retrySave.modifyRecordsCompletionBlock = mRecordCompletionBlock(saveOp: retrySave, completion: completion)
+                        retrySave.savePolicy = .allKeys
                         DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(retryAfter), execute: {
-                            if !saveOp.isFinished {
-                                CloudKitManager.publicDB.add(saveOp)
+                            if !retrySave.isFinished {
+                                CloudKitManager.publicDB.add(retrySave)
                             }
                         })
                         break
