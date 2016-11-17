@@ -26,3 +26,10 @@ class CustomTypeModel: ABModel {
     var array: ArrayModel?
     var str: StringModel?
 }
+
+class ComplexModel: ABModel {
+    var customArray:[CustomTypeModel] = [CustomTypeModel()]
+    var str: String?
+    var stM: StringModel?
+    var arr : ArrayModel?
+}

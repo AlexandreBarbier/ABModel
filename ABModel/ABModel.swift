@@ -19,7 +19,8 @@ open class ABModel: NSObject, NSCoding {
     
     open static var debug: Bool = false
     open static let reg  = try! NSRegularExpression(pattern: "[0-9]+([a-zA-Z]+)", options: NSRegularExpression.Options.caseInsensitive)
-    
+    static let rootKey = "root"
+    static let superKey = "super"
     static var appType = [String: AnyClass?]()
     static var mirrorKeys = [String:[String]]()
     
@@ -32,16 +33,29 @@ open class ABModel: NSObject, NSCoding {
     
     public required init?(coder aDecoder: NSCoder) {
         super.init()
-        
-        guard let dictionary = aDecoder.decodeObject(forKey: "root") as? Dictionary<String, AnyObject?> else {
+        do {
+            let dico : Dictionary<String, AnyObject>?
+            if #available(iOS 9.0, *) {
+                dico = try aDecoder.decodeTopLevelObject(forKey: ABModel.rootKey) as? Dictionary<String, AnyObject>
+            }
+            else {
+                dico = aDecoder.decodeObject(forKey: ABModel.rootKey) as? Dictionary<String, AnyObject>
+            }
+            
+            guard let dictionary = dico else {
+                return
+            }
+            parse(dictionary: dictionary)
+            
+        } catch {
+            ABModel.dPrint(value: "init with coder error")
             return
         }
-        parse(dictionary: dictionary)
     }
     
     open func encode(with aCoder: NSCoder) {
         let dico = toJSON()
-        aCoder.encode(dico, forKey: "root")
+        aCoder.encode(dico, forKey: ABModel.rootKey)
     }
     
     public override init() {
@@ -77,11 +91,15 @@ extension ABModel {
 extension ABModel {
     
     class func dPrint (value: Any?) -> Void {
-        ABModel.debug ? debugPrint(value ?? "value is nil") : ()
+        ABModel.debug ? print("----- ABModel\tDEBUG ------\n\(value ?? "value is nil")\n\t-----") : ()
     }
     
-    open func toJSON() -> Dictionary<String, AnyObject?> {
-        var json: Dictionary<String, AnyObject?> = [:]
+    class func errorPrint(value: Any?) -> Void {
+        print("----- ABModel\tERROR ------\n\(value ?? "value is nil")\n\t-----")
+    }
+    
+    open func toJSON() -> Dictionary<String, AnyObject> {
+        var json: Dictionary<String, AnyObject> = [:]
         let keys:[String] = fillMirrorKeys()
         
         for key in keys {
@@ -95,22 +113,22 @@ extension ABModel {
 
 // MARK: - parsing
 extension ABModel {
-    func parse(dictionary:Dictionary<String, AnyObject?>) {
+    func parse(dictionary:Dictionary<String, AnyObject>) {
         
         var finalDictionnary = dictionary
         
-        for (key, value) in dictionary {
+        for (key, val) in dictionary {
             if !responds(to: Selector(key)) {
                 let replacementKey = replaceKey(key)
                 finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
                 if !replacementKey.isEmpty {
-                    finalDictionnary.updateValue(value, forKey: replacementKey)
+                    finalDictionnary.updateValue(val, forKey: replacementKey)
                 }
                 else {
                     ABModel.dPrint(value:"Forgoten key : \(key) in \(type(of: self))")
                 }
             }
-            if let value = value, ignoreKey(key, value: value) {
+            if ignoreKey(key, value: val) {
                 finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
             }
         }
@@ -139,7 +157,7 @@ extension ABModel {
         let objectValue = self.value(forKey: key)
         if (value is [AnyObject] && value is Array<Dictionary<String, AnyObject>>) {
             guard var newArray = objectValue as? [ABModel] , newArray.count > 0 else {
-                print("\n#### FATAL ERROR ####\n key : \(key) is not initialised like this [CUSTOM_TYPE()] in \(NSStringFromClass(type(of: self)))")
+                ABModel.errorPrint(value:"\n#### FATAL ERROR ####\n key : \(key) is not initialised like this [CUSTOM_TYPE()] in \(NSStringFromClass(type(of: self)))")
                 fatalError("Error in parsing see console for more information")
             }
             let elementType = type(of: newArray[0])
@@ -181,7 +199,7 @@ extension ABModel {
         let objectClass: AnyClass? = NSClassFromString(result)
         ABModel.appType.updateValue(objectClass, forKey: "\(type(of: self)).\(key)")
         
-
+        
         return objectClass
     }
     
@@ -196,7 +214,7 @@ extension ABModel {
             while mkeys != nil {
                 let children = mkeys!.children
                 for value in children.enumerated() {
-                    if let key = value.element.0, key != "super", key != "", responds(to: Selector(key)) {
+                    if let key = value.element.0, key != ABModel.superKey, key != "", responds(to: Selector(key)) {
                         k.append(key)
                     }
                 }
@@ -208,10 +226,10 @@ extension ABModel {
         return keys
     }
     
-    func cleanModel(dictionnary:Dictionary<String, AnyObject?>) {
+    func cleanModel(dictionnary:Dictionary<String, AnyObject>) {
         let keys:[String] = fillMirrorKeys()
         for key in keys {
-            if dictionnary.contains(where: { (k: String, value: AnyObject?) -> Bool in
+            if dictionnary.contains(where: { (k: String, value: AnyObject) -> Bool in
                 return key == k
             }) {
                 continue

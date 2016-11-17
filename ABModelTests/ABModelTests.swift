@@ -43,8 +43,8 @@ class ABModelTests: XCTestCase {
     
     func testCustomParsing() {
         
-        let dico = ["array": arrayBaseDico as AnyObject, "str": stringBaseDico as AnyObject]
-        let object = CustomTypeModel(dictionary: dico)
+        let customBaseDico = ["array": arrayBaseDico as AnyObject, "str": stringBaseDico as AnyObject]
+        let object = CustomTypeModel(dictionary: customBaseDico)
         
         XCTAssert(object.array!.stringArray!.first == "one")
         XCTAssert(object.array!.intArray!.first == 1)
@@ -54,7 +54,13 @@ class ABModelTests: XCTestCase {
         XCTAssert(object.str!.third == "three")
     }
     
-    
+    func testComplexeModel() {
+        let customBaseDico = ["array": arrayBaseDico as AnyObject, "str": stringBaseDico as AnyObject]
+        let complexObjDico = ["customArray": Array(repeating:customBaseDico, count:100) as AnyObject, "stM": stringBaseDico as AnyObject]
+        let complexeObj = ComplexModel(dictionary:complexObjDico)
+        XCTAssert(complexeObj.customArray.count == 100)
+        XCTAssert(complexeObj.customArray.first?.str?.first == "one")
+    }
     
     func testPerformanceExample() {
         let baseDico = ["array": arrayBaseDico as AnyObject, "str": stringBaseDico as AnyObject]

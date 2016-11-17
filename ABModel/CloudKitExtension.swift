@@ -51,7 +51,7 @@ open class ABModelCloudKit : ABModel {
         operation.savePolicy = .changedKeys
         operation.perRecordCompletionBlock = { (record, error) in
             guard let rec = record else {
-                error != nil ? print("public save error\(error)") : ()
+                error != nil ? ABModel.errorPrint(value:"public save error\(error)") : ()
                 OperationQueue.main.addOperation({ () -> Void in
                     completion?(record, error as NSError?)
                 })
@@ -72,7 +72,7 @@ open class ABModelCloudKit : ABModel {
         
         operation.perRecordCompletionBlock = { (record, error) in
             guard let record = record else {
-                print("CKManager create \(error)")
+                ABModel.errorPrint(value:"CKManager create \(error)")
                 OperationQueue.main.addOperation({ () -> Void in
                     completion?(nil, error as NSError?)
                 })
@@ -94,7 +94,7 @@ open class ABModelCloudKit : ABModel {
         saveOp.perRecordCompletionBlock =  { (record, error) -> Void in
             guard let rec = record else {
                 OperationQueue.main.addOperation({ () -> Void in
-                    error != nil ? print("public save error\(error)") : ()
+                    error != nil ? ABModel.errorPrint(value:"public save error\(error)") : ()
                     completion?(nil, error as NSError?)
                 })
                 if let retryAfterValue = (error as? NSError)?.userInfo[CKErrorRetryAfterKey] as? TimeInterval  {
@@ -106,7 +106,7 @@ open class ABModelCloudKit : ABModel {
             self.record = rec
             self.recordId = rec.recordID
             OperationQueue.main.addOperation({ () -> Void in
-                error != nil ? print("public save error\(error)") : ()
+                error != nil ? ABModel.errorPrint(value:"public save error\(error)") : ()
                 completion?(rec, error as NSError?)
             })
             
@@ -123,7 +123,7 @@ open class ABModelCloudKit : ABModel {
         saveOp.modifyRecordsCompletionBlock = ABModelCloudKit.mRecordCompletionBlock(saveOp: saveOp, completion: completion)
         saveOp.perRecordCompletionBlock = { (record, error) in
             guard error == nil else {
-                print("save bulk error \(error)")
+                ABModel.errorPrint(value:"save bulk error \(error)")
                 return
             }
             ABModel.dPrint(value:"save bulk \(record)")
@@ -135,7 +135,7 @@ open class ABModelCloudKit : ABModel {
     open class func mRecordCompletionBlock(saveOp: CKModifyRecordsOperation, completion: (() -> Void)?) -> ((_ records: [CKRecord]?,_ recordsId:[CKRecordID]?,_ error : Error?) -> Void)? {
         return { (records: [CKRecord]?, recordsId:[CKRecordID]?, error : Error?) in
             guard error == nil else {
-                print("records completion block error \(error)")
+                ABModel.errorPrint(value:"records completion block error \(error)")
                 
                 if let error = error as? NSError {
                     let errorCode = CKError.Code.init(rawValue: error.code)!
@@ -157,7 +157,7 @@ open class ABModelCloudKit : ABModel {
                         let itemID = error.userInfo[CKPartialErrorsByItemIDKey]
                         ABModel.dPrint(value: itemID)
                         OperationQueue.main.addOperation({ () -> Void in
-                            print("partial failure \(error)")
+                            ABModel.errorPrint(value:"partial failure \(error)")
                             if ABModel.debug {
                                 for (key, value) in itemID as! Dictionary<AnyHashable, Any> {
                                     ABModel.dPrint(value:"key : \(key),  value : \(value)")
@@ -167,7 +167,7 @@ open class ABModelCloudKit : ABModel {
                         break
                     default:
                         OperationQueue.main.addOperation({ () -> Void in
-                            print("other \(error)")
+                            ABModel.errorPrint(value:"other \(error)")
                         })
                         break
                     }
@@ -187,7 +187,7 @@ open class ABModelCloudKit : ABModel {
             $0.modifyRecordsCompletionBlock = mRecordCompletionBlock(saveOp: $0, completion: completion)
             $0.perRecordCompletionBlock = { (record, error) in
                 guard error == nil else {
-                    print("save bulk error \(error)")
+                    ABModel.errorPrint(value:"save bulk error \(error)")
                     return
                 }
                 ABModel.dPrint(value: "save bulk \(record)")
@@ -200,7 +200,7 @@ open class ABModelCloudKit : ABModel {
     open func refresh<T:ABModelCloudKit>(_ completion:((_ updatedObj:T?)->Void)? = nil) {
         CloudKitManager.publicDB.fetch(withRecordID: self.recordId) { (record, error) -> Void in
             guard let record = record else {
-                print(error ?? "nil error")
+                ABModel.errorPrint(value:error)
                 OperationQueue.main.addOperation({ () -> Void in
                     completion?(nil)
                 })
@@ -215,7 +215,9 @@ open class ABModelCloudKit : ABModel {
     
     open func privateSave(_ completion:((_ record:CKRecord?, _ error:Error?)-> Void)? = nil) {
 		CloudKitManager.privateDB.save(self.toRecord(), completionHandler: { (record, error) -> Void in
-            print(error ?? "nil error")
+            if error != nil {
+                ABModel.errorPrint(value:error)
+            }
             completion?(record, error)
         }) 
     }
@@ -244,13 +246,13 @@ open class ABModelCloudKit : ABModel {
         CloudKitManager.publicDB.perform(query, inZoneWith: nil) { (records, error) -> Void in
             guard let records = records, let first = records.first else {
                 OperationQueue.main.addOperation({ () -> Void in
-                    print(error ?? "nil error")
+                    ABModel.errorPrint(value:error)
                     completion?(nil, error as NSError?)
                 })
                 return
             }
             OperationQueue.main.addOperation({ () -> Void in
-                print(error ?? "nil error")
+                ABModel.errorPrint(value:error)
                 completion?(first, error as NSError?)
             })
         }
@@ -259,7 +261,7 @@ open class ABModelCloudKit : ABModel {
     open func remove() {
         let deleteOp = CKModifyRecordsOperation(recordsToSave: nil, recordIDsToDelete: [self.recordId])
         deleteOp.perRecordCompletionBlock = {(record, error) in
-            print(error ?? "nil error")
+            ABModel.errorPrint(value:error)
         }
         CloudKitManager.publicDB.add(deleteOp)
     }
@@ -267,7 +269,7 @@ open class ABModelCloudKit : ABModel {
     open class func removeRecordId(_ record:CKRecordID) {
         let deleteOp = CKModifyRecordsOperation(recordsToSave: nil, recordIDsToDelete: [record])
         deleteOp.perRecordCompletionBlock = {(record,error) in
-            print(error ?? "nil error")
+            ABModel.errorPrint(value:error)
         }
         CloudKitManager.publicDB.add(deleteOp)
     }
@@ -282,12 +284,12 @@ open class ABModelCloudKit : ABModel {
         if let completion = completion {
             op.fetchRecordsCompletionBlock = { (recordDictionary, error) in
                 guard let recordDictionary = recordDictionary else {
-                    print("get ref record Dico error \(error)")
+                    ABModel.errorPrint(value:"get ref record Dico error \(error)")
                     completion([], nil)
                     return
                 }
                 guard error == nil else {
-                    print("get ref error \(error)")
+                    ABModel.errorPrint(value:"get ref error \(error)")
                     completion([], error as? NSError)
                     return
                 }
@@ -302,7 +304,7 @@ open class ABModelCloudKit : ABModel {
         if let perRecordCompletion = perRecordCompletion {
             op.perRecordCompletionBlock = { (record, recordId, error) in
                 guard error == nil else {
-                    print("get ref error \(error)")
+                    ABModel.errorPrint(value:"get ref error \(error)")
                     perRecordCompletion(nil, error as? NSError)
                     return
                 }
