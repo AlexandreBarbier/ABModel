@@ -148,7 +148,7 @@ extension ABModel {
         //here we check if the value is nil to avoid crash
         guard value != nil else {
             ABModel.dPrint(value:"Value for key : \(key) in \(type(of: self)) is nil")
-            if let objectValue = self.value(forKey: key), var newArray = objectValue as? [ABModel] {
+            if responds(to: Selector(key)), let objectValue = self.value(forKey: key), var newArray = objectValue as? [ABModel] {
                 newArray.removeAll()
             }
             return

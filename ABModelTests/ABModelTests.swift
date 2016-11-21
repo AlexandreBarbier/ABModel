@@ -45,7 +45,6 @@ class ABModelTests: XCTestCase {
         
         let customBaseDico = ["array": arrayBaseDico as AnyObject, "str": stringBaseDico as AnyObject]
         let object = CustomTypeModel(dictionary: customBaseDico)
-        
         XCTAssert(object.array!.stringArray!.first == "one")
         XCTAssert(object.array!.intArray!.first == 1)
         XCTAssert(object.array!.floatArray!.first == Float(1.0))
