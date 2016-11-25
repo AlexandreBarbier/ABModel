@@ -103,8 +103,9 @@ extension ABModel {
         let keys:[String] = fillMirrorKeys()
         
         for key in keys {
-            if responds(to: Selector(key)), let value = self.value(forKey: key) as? NSObject {
-                json.updateValue(value, forKey: key)
+            if responds(to: Selector(key)), let val = self.value(forKey: key) as? NSObject {
+                json.updateValue(val, forKey: key)
+                
             }
         }
         return json
@@ -155,7 +156,7 @@ extension ABModel {
         }
         var newValue : Any! = value
         let objectValue = self.value(forKey: key)
-        if (value is [AnyObject] && value is Array<Dictionary<String, AnyObject>>) {
+        if let arrayVal = value as? [AnyObject], arrayVal.count > 0 && (value is [AnyObject] && value is Array<Dictionary<String, AnyObject>>) {
             guard var newArray = objectValue as? [ABModel] , newArray.count > 0 else {
                 ABModel.errorPrint(value:"\n#### FATAL ERROR ####\n key : \(key) is not initialised like this [CUSTOM_TYPE()] in \(NSStringFromClass(type(of: self)))")
                 fatalError("Error in parsing see console for more information")
