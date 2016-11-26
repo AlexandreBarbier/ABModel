@@ -14,6 +14,12 @@
  * yourself to avoid a memory leak caused by the casting from NSArray to Array
  *
  */
+fileprivate struct ABCached {
+    static var shared = ABCached()
+    var appType = [String: AnyClass?]()
+    var mirrorKeys = [String:[String]]()
+}
+
 
 open class ABModel: NSObject, NSCoding {
     
@@ -21,8 +27,6 @@ open class ABModel: NSObject, NSCoding {
     open static let reg  = try! NSRegularExpression(pattern: "[0-9]+([a-zA-Z]+)", options: NSRegularExpression.Options.caseInsensitive)
     static let rootKey = "root"
     static let superKey = "super"
-    static var appType = [String: AnyClass?]()
-    static var mirrorKeys = [String:[String]]()
     
     open override var description: String {
         get
@@ -191,22 +195,24 @@ extension ABModel {
     }
     
     func getAttributeType(for key: String) -> AnyClass? {
-        if let cachedClass = ABModel.appType["\(type(of: self)).\(key)"] {
+        if let cachedClass = ABCached.shared.appType["\(type(of: self)).\(key)"] {
             return cachedClass
         }
-        let propAttr = property_getAttributes(class_getProperty(type(of: self), (key as NSString).utf8String!))
-        let str = NSString.init(utf8String: propAttr!)!
-        let result = applyRegex(str: str)
-        let objectClass: AnyClass? = NSClassFromString(result)
-        ABModel.appType.updateValue(objectClass, forKey: "\(type(of: self)).\(key)")
-        
+        var objectClass: AnyClass? = nil
+        if let UTFKey = (key as NSString).utf8String {
+            let propAttr = property_getAttributes(class_getProperty(type(of: self), UTFKey))
+            let str = NSString.init(utf8String: propAttr!)!
+            let result = applyRegex(str: str)
+            objectClass = NSClassFromString(result)
+            ABCached.shared.appType.updateValue(objectClass, forKey: "\(type(of: self)).\(key)")
+        }
         
         return objectClass
     }
     
     func fillMirrorKeys() -> [String] {
         let keys:[String]
-        if let k = ABModel.mirrorKeys["\(type(of: self))"] {
+        if let k = ABCached.shared.mirrorKeys["\(type(of: self))"] {
             keys = k
         }
         else {
@@ -221,7 +227,7 @@ extension ABModel {
                 }
                 mkeys = mkeys!.superclassMirror
             }
-            ABModel.mirrorKeys.updateValue(k, forKey: "\(type(of: self))")
+            ABCached.shared.mirrorKeys.updateValue(k, forKey: "\(type(of: self))")
             keys = k
         }
         return keys
