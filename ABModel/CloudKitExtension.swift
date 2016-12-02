@@ -153,6 +153,8 @@ open class ABModelCloudKit : ABModel {
                             }
                         })
                         break
+                    case .serverRejectedRequest:
+                        break
                     case .partialFailure:
                         let itemID = error.userInfo[CKPartialErrorsByItemIDKey]
                         ABModel.dPrint(value: itemID)

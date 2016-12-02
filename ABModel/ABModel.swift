@@ -24,7 +24,7 @@ fileprivate struct ABCached {
 open class ABModel: NSObject, NSCoding {
     
     open static var debug: Bool = false
-    open static let reg  = try! NSRegularExpression(pattern: "[0-9]+([a-zA-Z]+)", options: NSRegularExpression.Options.caseInsensitive)
+    open static let reg  = try! NSRegularExpression(pattern: "[0-9]+([a-zA-Z_]+)", options: NSRegularExpression.Options.caseInsensitive)
     static let rootKey = "root"
     static let superKey = "super"
     
