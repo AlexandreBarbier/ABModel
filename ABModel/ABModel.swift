@@ -99,7 +99,7 @@ extension ABModel {
     }
     
     class func errorPrint(value: Any?) -> Void {
-        print("----- ABModel\tERROR ------\n\(value ?? "value is nil")\n\t-----")
+        print("\t----- ABModel\tERROR ------\n\t\(Date())\t\n\(value ?? "value is nil")\n\t\t-----")
     }
     
     open func toJSON() -> Dictionary<String, AnyObject> {
