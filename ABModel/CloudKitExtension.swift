@@ -50,17 +50,17 @@ open class ABModelCloudKit : ABModel {
         let operation = CKModifyRecordsOperation(recordsToSave: [self.toRecord()], recordIDsToDelete: nil)
         operation.savePolicy = .changedKeys
         operation.perRecordCompletionBlock = { (record, error) in
-            guard let rec = record else {
-                error != nil ? ABModel.errorPrint(value:"public save error\(error)") : ()
+            guard error == nil else {
+                ABModel.errorPrint(value:"public save error\(error)")
                 OperationQueue.main.addOperation({ () -> Void in
                     completion?(record, error as NSError?)
                 })
                 return
             }
-            self.record = rec
-            self.recordId = rec.recordID
+            self.record = record
+            self.recordId = record.recordID
             OperationQueue.main.addOperation({ () -> Void in
-                completion?(rec, error as NSError?)
+                completion?(record, error as NSError?)
             })
         }
         CloudKitManager.publicDB.add(operation)
@@ -71,7 +71,7 @@ open class ABModelCloudKit : ABModel {
         let operation = CKModifyRecordsOperation(recordsToSave: [obj.toRecord()], recordIDsToDelete: nil)
         
         operation.perRecordCompletionBlock = { (record, error) in
-            guard let record = record else {
+            guard error == nil else {
                 ABModel.errorPrint(value:"CKManager create \(error)")
                 OperationQueue.main.addOperation({ () -> Void in
                     completion?(nil, error as NSError?)
@@ -92,7 +92,7 @@ open class ABModelCloudKit : ABModel {
         let saveOp = CKModifyRecordsOperation(recordsToSave: [self.toRecord()], recordIDsToDelete: nil)
         saveOp.savePolicy = .allKeys
         saveOp.perRecordCompletionBlock =  { (record, error) -> Void in
-            guard let rec = record else {
+            guard error == nil else {
                 OperationQueue.main.addOperation({ () -> Void in
                     error != nil ? ABModel.errorPrint(value:"public save error\(error)") : ()
                     completion?(nil, error as NSError?)
@@ -103,11 +103,11 @@ open class ABModelCloudKit : ABModel {
                 }
                 return
             }
-            self.record = rec
-            self.recordId = rec.recordID
+            self.record = record
+            self.recordId = record.recordID
             OperationQueue.main.addOperation({ () -> Void in
                 error != nil ? ABModel.errorPrint(value:"public save error\(error)") : ()
-                completion?(rec, error as NSError?)
+                completion?(record, error as NSError?)
             })
             
         }
