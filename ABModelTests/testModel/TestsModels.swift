@@ -21,15 +21,14 @@ class ArrayModel: ABModel {
     var floatArray: [Float]?
 }
 
-
 class CustomTypeModel: ABModel {
     var array: ArrayModel?
     var str: StringModel?
 }
 
 class ComplexModel: ABModel {
-    var customArray:[CustomTypeModel] = [CustomTypeModel()]
+    var customArray: [CustomTypeModel] = [CustomTypeModel()]
     var str: String?
     var stM: StringModel?
-    var arr : ArrayModel?
+    var arr: ArrayModel?
 }

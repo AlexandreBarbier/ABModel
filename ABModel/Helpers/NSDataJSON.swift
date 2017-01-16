@@ -9,14 +9,15 @@
 import UIKit
 
 public extension Data {
-    func toJSON() -> Dictionary<String, AnyObject> {
+    func toJSON() -> [String: AnyObject] {
         do {
-            if let data = try JSONSerialization.jsonObject(with: self, options: JSONSerialization.ReadingOptions.mutableLeaves) as? Dictionary<String, AnyObject> {
+            if let data = try JSONSerialization.jsonObject(with: self,
+                                                           options: JSONSerialization.ReadingOptions.mutableLeaves)
+                as? [String: AnyObject] {
                 return data
             }
             return [:]
-        }
-        catch {
+        } catch {
             return [:]
         }
     }
