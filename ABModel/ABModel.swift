@@ -43,6 +43,7 @@ open class ABModel: NSObject, NSCoding {
                 dico = aDecoder.decodeObject(forKey: ABModel.rootKey) as? [String: AnyObject]
             }
             guard let dictionary = dico else {
+                ABModel.errorPrint(value: "error in init with decoder")
                 return
             }
             parse(dictionary: dictionary)
@@ -102,7 +103,8 @@ extension ABModel {
         let keys: [String] = fillMirrorKeys()
 
         for key in keys {
-            if responds(to: Selector(key)), let val = self.value(forKey: key) as? NSObject {
+            if responds(to: Selector(key)),
+                let val = self.value(forKey: key) as? NSObject {
                 json.updateValue(val, forKey: key)
             }
         }
@@ -166,10 +168,9 @@ extension ABModel {
             let elementType = type(of: newArray[0])
             newArray.removeAll(keepingCapacity: false)
             if let value = value as? [[String: AnyObject]] {
-                for val in value {
-                    let l = elementType.init(dictionary: val)
-                    newArray.append(l)
-                }
+                newArray = value.map({ (val) -> ABModel in
+                   return elementType.init(dictionary: val)
+                })
             }
             newValue = newArray
         } else if value is [String: AnyObject] && !(objectValue is [String: AnyObject]) {
