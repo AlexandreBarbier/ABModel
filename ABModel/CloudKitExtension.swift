@@ -15,12 +15,12 @@ open class ABModelCloudKit: ABModel {
     open var record: CKRecord!
     open var recordId: CKRecordID!
 
-    public required init(record: CKRecord, recordId: CKRecordID) {
+    public required init(record rec: CKRecord, recordId rId: CKRecordID) {
         let keys = record.allKeys()
         let dictionary = record.dictionaryWithValues(forKeys: keys)
         super.init(dictionary: dictionary as [String: AnyObject])
-        self.recordId = recordId
-        self.record = record
+        recordId = rId
+        record = rec
     }
 
     public required override init() {
@@ -43,8 +43,8 @@ open class ABModelCloudKit: ABModel {
 
     open override func encode(with aCoder: NSCoder) {
         super.encode(with: aCoder)
-        aCoder.encode(self.recordId, forKey: "recordId")
-        aCoder.encode(self.record, forKey: "record")
+        aCoder.encode(recordId, forKey: "recordId")
+        aCoder.encode(record, forKey: "record")
     }
 
     public required init(dictionary: [String: AnyObject]) {
@@ -54,7 +54,7 @@ open class ABModelCloudKit: ABModel {
 
 extension ABModelCloudKit {
     open func updateRecord(_ completion:((_ record: CKRecord?, _ error: NSError?) -> Void)? = nil) {
-        let operation = CKModifyRecordsOperation(recordsToSave: [self.toRecord()], recordIDsToDelete: nil)
+        let operation = CKModifyRecordsOperation(recordsToSave: [toRecord()], recordIDsToDelete: nil)
         operation.savePolicy = .changedKeys
         operation.perRecordCompletionBlock = { (record, error) in
             guard error == nil else {
@@ -114,7 +114,7 @@ extension ABModelCloudKit {
             self.record = record
             self.recordId = record.recordID
             OperationQueue.main.addOperation({ () -> Void in
-                error != nil ? ABModel.errorPrint(value:"public save error\(error)") : ()
+                error != nil ? ABModel.errorPrint(value: "public save error\(error)") : ()
                 completion?(record, error as NSError?)
             })
         }
@@ -352,44 +352,38 @@ open class CloudKitManager {
 
     open class func availability(_ completion:((_ available: Bool, _ alert: UIAlertController?) -> Void)? = nil) {
         CloudKitManager.container.accountStatus { (status, error) -> Void in
+            let title: String
+            let message: String
             switch status {
             case .available:
                 CloudKitManager.isAvailable = true
                 OperationQueue.main.addOperation({ () -> Void in
                     completion?(true, nil)
                 })
-                break
+                return
             case .couldNotDetermine :
-                OperationQueue.main.addOperation({ () -> Void in
-                    let alert = UIAlertController(title: "An error occured while connecting to your iCloud account",
-                                                  message: error!.localizedDescription,
-                                                  preferredStyle: UIAlertControllerStyle.alert)
-                    completion?(false, alert)
-                })
+                title = "An error occured while connecting to your iCloud account"
+                message = error!.localizedDescription
                 break
             case .noAccount:
                 CloudKitManager.isAvailable = false
-                let message = "To use this app you need to be connected to your iCloud account"
-                OperationQueue.main.addOperation({ () -> Void in
-                    let alert = UIAlertController(title: "iCloud account required",
-                                                  message: message,
-                                                  preferredStyle: UIAlertControllerStyle.alert)
-                    completion?(false, alert)
-                })
+                title = "iCloud account required"
+                message = "To use this app you need to be connected to your iCloud account"
+
                 break
             case .restricted :
                 CloudKitManager.isAvailable = false
-                let message = "To use this app you need to be connected " +
+                title = "iCloud capabilities required"
+                message = "To use this app you need to be connected " +
                 "to your iCloud account and set iCloud Drive enable"
-                OperationQueue.main.addOperation({ () -> Void in
-                    let alert = UIAlertController(title: "iCloud capabilities required",
-                                                  message: message,
-                                                  preferredStyle: UIAlertControllerStyle.alert)
-                    completion?(false, alert)
-                })
                 break
             }
+            OperationQueue.main.addOperation({ () -> Void in
+                let alert = UIAlertController(title: title,
+                                              message: message,
+                                              preferredStyle: UIAlertControllerStyle.alert)
+                completion?(false, alert)
+            })
         }
     }
-
 }
