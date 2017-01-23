@@ -11,7 +11,10 @@ import XCTest
 import ABModel
 
 class ABModelTests: XCTestCase {
-    let stringBaseDico = ["first": "one" as AnyObject, "second": "two" as AnyObject, "third": "three" as AnyObject]
+    let stringBaseDico = ["first": "one" as AnyObject,
+                          "second": "two" as AnyObject,
+                          "third": "three" as AnyObject,
+                          "fourth": 4 as AnyObject]
     let arrayBaseDico = ["stringArray": ["one", "two", "three"] as AnyObject,
                          "intArray": [1, 2, 3] as AnyObject,
                          "floatArray": [Float(1.0), Float(1.99)] as AnyObject]
@@ -31,6 +34,7 @@ class ABModelTests: XCTestCase {
         XCTAssert(object.first == "one")
         XCTAssert(object.second == "two")
         XCTAssert(object.third == "three")
+        XCTAssert(object.fourth == 4)
     }
 
     func testArrayParsing() {

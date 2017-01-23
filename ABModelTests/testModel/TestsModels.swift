@@ -13,6 +13,7 @@ class StringModel: ABModel {
     var first: String?
     var second: String?
     var third: String?
+    var fourth: Float = 0
 }
 
 class ArrayModel: ABModel {

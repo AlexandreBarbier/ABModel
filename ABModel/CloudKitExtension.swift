@@ -290,7 +290,7 @@ extension ABModelCloudKit {
 
     open func getReferences<T: ABModelCloudKit>(_ references: [CKReference],
                             completion:((_ results: [T], _ error: NSError?) -> Void)? = nil,
-                            perRecordCompletion:((_ result: T?, _ error: NSError?) -> Void)? = nil) {
+                            perRecordCompletion: ((_ result: T?, _ error: NSError?) -> Void)? = nil) {
         var results = [T]()
         let refs = references.map({ (reference) -> CKRecordID in
             reference.recordID
