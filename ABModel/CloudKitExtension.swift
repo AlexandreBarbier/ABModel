@@ -16,8 +16,8 @@ open class ABModelCloudKit: ABModel {
     open var recordId: CKRecordID!
 
     public required init(record rec: CKRecord, recordId rId: CKRecordID) {
-        let keys = record.allKeys()
-        let dictionary = record.dictionaryWithValues(forKeys: keys)
+        let keys = rec.allKeys()
+        let dictionary = rec.dictionaryWithValues(forKeys: keys)
         super.init(dictionary: dictionary as [String: AnyObject])
         recordId = rId
         record = rec
