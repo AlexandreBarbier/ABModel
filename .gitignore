@@ -15,3 +15,4 @@ ABModel/ABModel.xcodeproj/xcuserdata/alexandrebarbier.xcuserdatad/xcschemes/ABMo
 ABModel/ABModel.xcodeproj/xcuserdata/alexandrebarbier.xcuserdatad/xcschemes/ABModelTests.xcscheme
 ABModel/ABModel.xcodeproj/xcuserdata/alexandrebarbier.xcuserdatad/xcschemes/xcschememanagement.plist
 Breakpoints_v2.xcbkptlist
+swiftLint.sh

@@ -153,8 +153,8 @@
 				AC3E68FE19B4C84500681A5A /* Sources */,
 				AC3E68FF19B4C84500681A5A /* Frameworks */,
 				AC3E690019B4C84500681A5A /* Headers */,
+				8DAEE0121E2D2AE2003EF968 /* Swift Lint */,
 				AC3E690119B4C84500681A5A /* Resources */,
-				8DAEE0121E2D2AE2003EF968 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -244,13 +244,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		8DAEE0121E2D2AE2003EF968 /* ShellScript */ = {
+		8DAEE0121E2D2AE2003EF968 /* Swift Lint */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Swift Lint";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;

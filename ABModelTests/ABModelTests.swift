@@ -14,7 +14,7 @@ class ABModelTests: XCTestCase {
     let stringBaseDico = ["first": "one" as AnyObject,
                           "second": "two" as AnyObject,
                           "third": "three" as AnyObject,
-                          "fourth": 4 as AnyObject]
+                          "fourth": 4.0 as AnyObject]
     let arrayBaseDico = ["stringArray": ["one", "two", "three"] as AnyObject,
                          "intArray": [1, 2, 3] as AnyObject,
                          "floatArray": [Float(1.0), Float(1.99)] as AnyObject]
@@ -31,7 +31,7 @@ class ABModelTests: XCTestCase {
 
     func testStringParsing() {
 
-        let object = StringModel(dictionary: stringBaseDico)
+        let object = StringModel(dictionary:stringBaseDico)
 
         XCTAssert(object.first == "one")
         XCTAssert(object.second == "two")
@@ -82,6 +82,21 @@ class ABModelTests: XCTestCase {
             resultArray.removeAll()
             for dico in hugeDico {
                 resultArray.append(CustomTypeModel(dictionary: dico))
+            }
+        }
+
+        XCTAssert(resultArray.count == 1000)
+    }
+
+    func testSimpleParsing() {
+        let baseDico = ["array": arrayBaseDico as AnyObject,
+                        "str": stringBaseDico as AnyObject]
+        let hugeDico = Array(repeating: baseDico, count: 1000)
+        var resultArray: [CustomTypeModel] = []
+        measure {
+            resultArray.removeAll()
+            for dico in hugeDico {
+                resultArray.append(CustomTypeModel(with: dico))
             }
         }
 

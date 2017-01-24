@@ -10,7 +10,7 @@
  *
  * You just need to inherit from this class to be able to create object from JSON
  * You have to name your properties like the JSON keys or override the method replaceKey to rename a JSON key
- * If you have an array<T> where T does not inherit from ABModel 
+ * If you have an array<T> where T does not inherit from ABModel
  * or is not a basic type you should use the ignore key method and fill the array
  * yourself to avoid a memory leak caused by the casting from NSArray to Array
  *
@@ -19,6 +19,7 @@ fileprivate struct ABCached {
     static var shared = ABCached()
     var appType = [String: AnyClass?]()
     var mirrorKeys = [String: [String]]()
+    var arrayElementType = [String: AnyClass?]()
 }
 
 open class ABModel: NSObject, NSCoding {
@@ -43,7 +44,6 @@ open class ABModel: NSObject, NSCoding {
                 dico = aDecoder.decodeObject(forKey: ABModel.rootKey) as? [String: AnyObject]
             }
             guard let dictionary = dico else {
-                ABModel.errorPrint(value: "error in init with decoder")
                 return
             }
             parse(dictionary: dictionary)
@@ -103,8 +103,7 @@ extension ABModel {
         let keys: [String] = fillMirrorKeys()
 
         for key in keys {
-            if responds(to: Selector(key)),
-                let val = self.value(forKey: key) as? NSObject {
+            if responds(to: Selector(key)), let val = self.value(forKey: key) as? NSObject {
                 json.updateValue(val, forKey: key)
             }
         }
@@ -154,32 +153,44 @@ extension ABModel {
             }
             return
         }
-        var newValue : Any! = value
-        let objectValue = self.value(forKey: key)
-        if let arrayVal = value as? [AnyObject], arrayVal.count > 0 &&
-            (value is [AnyObject] &&
-                value is [[String: AnyObject]]) {
-            guard var newArray = objectValue as? [ABModel], newArray.count > 0 else {
-                ABModel.errorPrint(value:
-                    "\n#### FATAL ERROR ####\n key : \(key) is not initialised like this [CUSTOM_TYPE()]"
-                    + " in \(NSStringFromClass(type(of: self)))")
-                fatalError("Error in parsing see console for more information")
+        var newValue: Any?
+        if value is [AnyObject] {
+            let objectValue = self.value(forKey: key)
+            if let eType = ABCached.shared.arrayElementType[key] as? ABModel.Type {
+                guard var newArray = objectValue as? [ABModel], newArray.count > 0 else {
+                    ABModel.errorPrint(value:
+                        "\n#### FATAL ERROR ####\n key : \(key) is not initialised like this [CUSTOM_TYPE()]"
+                            + " in \(NSStringFromClass(type(of: self)))")
+                    fatalError("Error in parsing see console for more information")
+                }
+                newArray.removeAll(keepingCapacity: false)
+                if let value = value as? [[String: AnyObject]] {
+                    newArray = value.map({ (dico) -> ABModel in
+                        return eType.init(dictionary: dico)
+                    })
+                }
+                newValue = newArray
+            } else if value is [[String: AnyObject]] {
+                guard var newArray = objectValue as? [ABModel], newArray.count > 0 else {
+                    ABModel.errorPrint(value:
+                        "\n#### FATAL ERROR ####\n key : \(key) is not initialised like this [CUSTOM_TYPE()]"
+                            + " in \(NSStringFromClass(type(of: self)))")
+                    fatalError("Error in parsing see console for more information")
+                }
+                let elementType = type(of: newArray[0])
+                ABCached.shared.arrayElementType.updateValue(elementType, forKey: key)
+                newArray.removeAll(keepingCapacity: false)
+                if let value = value as? [[String: AnyObject]] {
+                    newArray = value.map({ (dico) -> ABModel in
+                        return elementType.init(dictionary: dico)
+                    })
+                }
+                newValue = newArray
             }
-            let elementType = type(of: newArray[0])
-            newArray.removeAll(keepingCapacity: false)
-            if let value = value as? [[String: AnyObject]] {
-                newArray = value.map({ (val) -> ABModel in
-                   return elementType.init(dictionary: val)
-                })
-            }
-            newValue = newArray
-        } else if value is [String: AnyObject] && !(objectValue is [String: AnyObject]) {
-            if  let objectType = getAttributeType(for:key) as? ABModel.Type,
-                let objectValue = value as? [String: AnyObject] {
-                newValue = objectType.init(dictionary: objectValue)
-            }
+        } else if let objectType = getAttributeType(for:key) as? ABModel.Type {
+            newValue = objectType.init(dictionary: (value as? [String : AnyObject])!)
         }
-        super.setValue(newValue, forKey: key)
+        super.setValue(newValue ?? value, forKey: key)
     }
 }
 
@@ -188,8 +199,8 @@ extension ABModel {
 
     func applyRegex(str: NSString) -> String {
         let matches = ABModel.reg!.matches(in: str as String,
-                                          options: NSRegularExpression.MatchingOptions.reportCompletion,
-                                          range: NSRange(location: 0, length: str.length))
+                                           options: NSRegularExpression.MatchingOptions.reportCompletion,
+                                           range: NSRange(location: 0, length: str.length))
         let result = matches.map({ (matchResult) -> String in
             return str.substring(with: matchResult.rangeAt(1))
         }).joined(separator: ".")
@@ -217,10 +228,12 @@ extension ABModel {
             keys = k
         } else {
             var mkeys: Mirror? = Mirror(reflecting: self)
+
             var k: [String] = []
             while mkeys != nil {
                 let children = mkeys!.children
                 for value in children.enumerated() {
+
                     if let key = value.element.0, key != ABModel.superKey, key != "", responds(to: Selector(key)) {
                         k.append(key)
                     }

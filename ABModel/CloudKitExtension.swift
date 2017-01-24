@@ -102,11 +102,11 @@ extension ABModelCloudKit {
         saveOp.perRecordCompletionBlock = { (record, error) -> Void in
             guard error == nil else {
                 OperationQueue.main.addOperation({ () -> Void in
-                    error != nil ? ABModel.errorPrint(value:"public save error\(error)") : ()
+                    error != nil ? ABModel.errorPrint(value: "public save error\(error)") : ()
                     completion?(nil, error as NSError?)
                 })
                 if let retryAfterValue = (error as? NSError)?.userInfo[CKErrorRetryAfterKey] as? TimeInterval {
-                    ABModel.dPrint(value:"should retry")
+                    ABModel.dPrint(value: "should retry")
                     self.perform(#selector(ABModelCloudKit.publicSave(_:)), with: nil, afterDelay:retryAfterValue)
                 }
                 return
@@ -214,7 +214,7 @@ extension ABModelCloudKit {
     open func refresh<T: ABModelCloudKit>(_ completion:((_ updatedObj: T?) -> Void)? = nil) {
         CloudKitManager.publicDB.fetch(withRecordID: self.recordId) { (record, error) -> Void in
             guard let record = record else {
-                ABModel.errorPrint(value:error)
+                ABModel.errorPrint(value: error)
                 OperationQueue.main.addOperation({ () -> Void in
                     completion?(nil)
                 })
@@ -369,7 +369,6 @@ open class CloudKitManager {
                 CloudKitManager.isAvailable = false
                 title = "iCloud account required"
                 message = "To use this app you need to be connected to your iCloud account"
-
                 break
             case .restricted :
                 CloudKitManager.isAvailable = false
