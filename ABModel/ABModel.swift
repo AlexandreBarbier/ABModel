@@ -187,8 +187,9 @@ extension ABModel {
                 }
                 newValue = newArray
             }
-        } else if let objectType = getAttributeType(for:key) as? ABModel.Type {
-            newValue = objectType.init(dictionary: (value as? [String : AnyObject])!)
+        } else if let value = value as? [String : AnyObject],
+            let objectType = getAttributeType(for:key) as? ABModel.Type {
+            newValue = objectType.init(dictionary: value)
         }
         super.setValue(newValue ?? value, forKey: key)
     }
