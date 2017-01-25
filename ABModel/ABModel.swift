@@ -31,7 +31,7 @@ open class ABModel: NSObject, NSCoding {
     static let superKey = "super"
 
     open override var description: String {
-        return "ABModel super class you should override this method in \(NSStringFromClass(type(of: self)))"
+        return "ABModel super class you should override description in \(NSStringFromClass(type(of: self)))"
     }
 
     public required init?(coder aDecoder: NSCoder) {
@@ -90,12 +90,12 @@ extension ABModel {
 // MARK: - Helper
 extension ABModel {
 
-    class func dPrint (value: Any?) -> Void {
-        ABModel.debug ? print("----- ABModel\tDEBUG ------\n\(value ?? "value is nil")\n\t-----") : ()
+    class func dPrint (value: Any) -> Void {
+        ABModel.debug ? print("----- ABModel\tDEBUG -----\n\(value)\n------------\t------------") : ()
     }
 
-    class func errorPrint(value: Any?) -> Void {
-        print("\t----- ABModel\tERROR ------\n\t\(Date())\t\n\(value ?? "value is nil")\n\t\t-----")
+    class func errorPrint(value: Any) -> Void {
+        print("\t----- ABModel\tERROR -----\n\t\(Date())\t\n\(value)\n\t------------\t------------")
     }
 
     open func toJSON() -> [String: AnyObject] {
@@ -187,9 +187,11 @@ extension ABModel {
                 }
                 newValue = newArray
             }
-        } else if let value = value as? [String : AnyObject],
-            let objectType = getAttributeType(for:key) as? ABModel.Type {
-            newValue = objectType.init(dictionary: value)
+        } else if !(value is ABModel) {
+            if let objectType = getAttributeType(for:key) as? ABModel.Type,
+                let value = value as? [String : AnyObject] {
+                newValue = objectType.init(dictionary: value)
+            }
         }
         super.setValue(newValue ?? value, forKey: key)
     }

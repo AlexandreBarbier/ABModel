@@ -170,7 +170,7 @@ extension ABModelCloudKit {
                             break
                         case .partialFailure:
                             let itemID = error.userInfo[CKPartialErrorsByItemIDKey]
-                            ABModel.dPrint(value: itemID)
+                            ABModel.dPrint(value: itemID ?? "no itemID")
                             OperationQueue.main.addOperation({ () -> Void in
                                 ABModel.errorPrint(value:"partial failure \(error)")
                                 if ABModel.debug, let itemID = itemID as? [AnyHashable: Any] {
@@ -214,7 +214,7 @@ extension ABModelCloudKit {
     open func refresh<T: ABModelCloudKit>(_ completion:((_ updatedObj: T?) -> Void)? = nil) {
         CloudKitManager.publicDB.fetch(withRecordID: self.recordId) { (record, error) -> Void in
             guard let record = record else {
-                ABModel.errorPrint(value: error)
+                ABModel.errorPrint(value: error ?? "refresh no error & no record")
                 OperationQueue.main.addOperation({ () -> Void in
                     completion?(nil)
                 })
@@ -230,7 +230,7 @@ extension ABModelCloudKit {
     open func privateSave(_ completion:((_ record: CKRecord?, _ error: Error?) -> Void)? = nil) {
         CloudKitManager.privateDB.save(self.toRecord(), completionHandler: { (record, error) -> Void in
             if error != nil {
-                ABModel.errorPrint(value:error)
+                ABModel.errorPrint(value:error!)
             }
             completion?(record, error)
         })
@@ -260,13 +260,12 @@ extension ABModelCloudKit {
         CloudKitManager.publicDB.perform(query, inZoneWith: nil) { (records, error) -> Void in
             guard let records = records, let first = records.first else {
                 OperationQueue.main.addOperation({ () -> Void in
-                    ABModel.errorPrint(value:error)
+                    ABModel.errorPrint(value:error ?? "get record no record no error")
                     completion?(nil, error as NSError?)
                 })
                 return
             }
             OperationQueue.main.addOperation({ () -> Void in
-                ABModel.errorPrint(value:error)
                 completion?(first, error as NSError?)
             })
         }
@@ -275,7 +274,7 @@ extension ABModelCloudKit {
     open func remove() {
         let deleteOp = CKModifyRecordsOperation(recordsToSave: nil, recordIDsToDelete: [self.recordId])
         deleteOp.perRecordCompletionBlock = {(record, error) in
-            ABModel.errorPrint(value:error)
+            ABModel.errorPrint(value:error ?? "no error in remove")
         }
         CloudKitManager.publicDB.add(deleteOp)
     }
@@ -283,7 +282,7 @@ extension ABModelCloudKit {
     open class func removeRecordId(_ record: CKRecordID) {
         let deleteOp = CKModifyRecordsOperation(recordsToSave: nil, recordIDsToDelete: [record])
         deleteOp.perRecordCompletionBlock = {(record, error) in
-            ABModel.errorPrint(value:error)
+            ABModel.errorPrint(value:error ?? "no error in remove record id")
         }
         CloudKitManager.publicDB.add(deleteOp)
     }
