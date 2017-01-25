@@ -15,8 +15,6 @@ class StringModel: ABModel {
     var third: String?
     var fourth: Float = 0
 
-
-
     init(with str: [String: AnyObject]) {
         super.init()
         if let fi = str["first"] as? String {
@@ -32,11 +30,11 @@ class StringModel: ABModel {
             self.fourth = fi.floatValue
         }
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     required init(dictionary: [String : AnyObject]) {
         super.init(dictionary: dictionary)
     }
@@ -46,7 +44,6 @@ class ArrayModel: ABModel {
     var stringArray: [String]?
     var intArray: [Int]?
     var floatArray: [Float]?
-
 
     init(with str: [String: AnyObject]) {
         super.init()
