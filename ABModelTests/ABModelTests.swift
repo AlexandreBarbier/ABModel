@@ -39,6 +39,67 @@ class ABModelTests: XCTestCase {
         XCTAssert(object.fourth == 4)
     }
 
+    func testDescription() {
+        let object = StringModel(dictionary:stringBaseDico)
+        let classStr = NSStringFromClass(type(of: object))
+        XCTAssert("ABModel super class you should override description in \(classStr)" == object.description)
+    }
+
+
+    func testWrong() {
+        ABModel.debug = true
+        let object = WrongModel(dictionary: ["uninitialisedArray" : [stringBaseDico, stringBaseDico] as AnyObject,
+                                             "replaceMe": "OK" as AnyObject, "strTest": "test" as AnyObject,
+                                             "strTest2": "test" as AnyObject])
+        XCTAssert(object.replaced == "OK")
+        XCTAssert(object.strTest == "test")
+
+        ABModel.debug = false
+        let object2 = WrongModel(dictionary: ["uninitialisedArray" : [stringBaseDico, stringBaseDico] as AnyObject,
+                                             "replaceMe": "OK" as AnyObject, "strTest": "test" as AnyObject,
+                                             "strTest2": "test" as AnyObject])
+        XCTAssert(object2.replaced == "OK")
+        XCTAssert(object2.strTest == "test")
+    }
+
+    func testError() {
+        let object = WrongModel(dictionary: ["uninitialisedArray" : [stringBaseDico, stringBaseDico] as AnyObject,
+                                             "replaceMe": "OK" as AnyObject])
+        XCTAssert(object.replaced == "OK")
+    }
+
+
+    func testCoder() {
+        let object = StringModel(dictionary:stringBaseDico)
+
+        let data = NSKeyedArchiver.archivedData(withRootObject: object)
+        let _ : UserDefaults = {
+            $0.set(data, forKey:"test")
+            $0.synchronize()
+            return $0
+        } (UserDefaults.standard)
+        if let dataObject = UserDefaults.standard.value(forKey: "test") as? Data {
+            if let codedObject = NSKeyedUnarchiver.unarchiveObject(with: dataObject) as? StringModel {
+                XCTAssert(codedObject.first == "one")
+                XCTAssert(codedObject.second == "two")
+                XCTAssert(codedObject.third == "three")
+                XCTAssert(codedObject.fourth == 4)
+            }
+        } else {
+            XCTFail()
+        }
+    }
+
+    func testPrint() {
+        let object = StringModel(dictionary:stringBaseDico)
+        let k = object.toJSON()
+        for (key, value) in stringBaseDico {
+            if let val = value as? String, let jsVal = k[key] as? String {
+                XCTAssert(jsVal == val)
+            }
+        }
+    }
+
     func testArrayParsing() {
 
         let object = ArrayModel(dictionary: arrayBaseDico)
@@ -67,8 +128,10 @@ class ABModelTests: XCTestCase {
                               "str": stringBaseDico as AnyObject]
         let complexObjDico = ["customArray": Array(repeating:customBaseDico, count:100) as AnyObject,
                               "stM": stringBaseDico as AnyObject]
-        let complexeObj = ComplexModel(dictionary:complexObjDico)
-
+        var complexeObj = ComplexModel(dictionary:complexObjDico)
+        for _ in 0..<10 {
+            complexeObj = ComplexModel(dictionary:complexObjDico)
+        }
         XCTAssert(complexeObj.customArray.count == 100)
         XCTAssert(complexeObj.customArray.first?.str?.first == "one")
     }

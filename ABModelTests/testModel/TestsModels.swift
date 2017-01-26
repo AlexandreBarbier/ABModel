@@ -9,6 +9,34 @@
 import UIKit
 import ABModel
 
+class WrongModel: ABModel {
+    var uninitialisedArray: [StringModel]!
+    var replaced: String?
+    var strTest: String?
+
+    override func ignoreKey(_ key: String, value: AnyObject) -> Bool {
+        if key == "uninitialisedArray" {
+            uninitialisedArray = []
+            if let aray = value as? [[String: AnyObject]] {
+                for element in aray {
+                    let obj = StringModel(dictionary: element)
+                    uninitialisedArray.append(obj)
+                }
+            }
+            return true
+        }
+        return false
+    }
+
+    override func replaceKey(_ key: String) -> String {
+        if key == "replaceMe" {
+            return "replaced"
+        }
+        return super.replaceKey(key)
+    }
+
+}
+
 class StringModel: ABModel {
     var first: String?
     var second: String?
@@ -32,7 +60,7 @@ class StringModel: ABModel {
     }
 
     required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        super.init(coder: aDecoder)
     }
 
     required init(dictionary: [String : AnyObject]) {

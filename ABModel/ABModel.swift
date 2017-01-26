@@ -64,7 +64,6 @@ open class ABModel: NSObject, NSCoding {
 
     public required init(dictionary: [String: AnyObject]) {
         super.init()
-
         parse(dictionary: dictionary)
     }
 
@@ -72,6 +71,7 @@ open class ABModel: NSObject, NSCoding {
 
 // MARK: - override this if needed
 extension ABModel {
+
     /**
      * You should override this method only if you want to ignore JSON key
      */
@@ -154,38 +154,32 @@ extension ABModel {
             return
         }
         var newValue: Any?
+
         if value is [AnyObject] {
             let objectValue = self.value(forKey: key)
-            if let eType = ABCached.shared.arrayElementType[key] as? ABModel.Type {
-                guard var newArray = objectValue as? [ABModel], newArray.count > 0 else {
-                    ABModel.errorPrint(value:
-                        "\n#### FATAL ERROR ####\n key : \(key) is not initialised like this [CUSTOM_TYPE()]"
-                            + " in \(NSStringFromClass(type(of: self)))")
-                    fatalError("Error in parsing see console for more information")
-                }
-                newArray.removeAll(keepingCapacity: false)
+            let fillArray = {(eType: ABModel.Type) in
+                var newArray: [ABModel] = []
                 if let value = value as? [[String: AnyObject]] {
                     newArray = value.map({ (dico) -> ABModel in
                         return eType.init(dictionary: dico)
                     })
                 }
                 newValue = newArray
+            }
+
+            if let eType = ABCached.shared.arrayElementType[key] as? ABModel.Type {
+                fillArray(eType)
             } else if value is [[String: AnyObject]] {
-                guard var newArray = objectValue as? [ABModel], newArray.count > 0 else {
+                guard let newArray = objectValue as? [ABModel], newArray.count > 0 else {
                     ABModel.errorPrint(value:
                         "\n#### FATAL ERROR ####\n key : \(key) is not initialised like this [CUSTOM_TYPE()]"
                             + " in \(NSStringFromClass(type(of: self)))")
                     fatalError("Error in parsing see console for more information")
                 }
                 let elementType = type(of: newArray[0])
+
                 ABCached.shared.arrayElementType.updateValue(elementType, forKey: key)
-                newArray.removeAll(keepingCapacity: false)
-                if let value = value as? [[String: AnyObject]] {
-                    newArray = value.map({ (dico) -> ABModel in
-                        return elementType.init(dictionary: dico)
-                    })
-                }
-                newValue = newArray
+                fillArray(elementType)
             }
         } else if !(value is ABModel) {
             if let objectType = getAttributeType(for:key) as? ABModel.Type,
