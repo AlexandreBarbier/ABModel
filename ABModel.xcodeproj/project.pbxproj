@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8D39EFAD1E3A463B0084B71B /* CloudkitExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D39EFAC1E3A463B0084B71B /* CloudkitExtension.swift */; };
 		8DB533E11AFFEB74008C2078 /* NSDataJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB533E01AFFEB74008C2078 /* NSDataJSON.swift */; };
 		8DC930F61DD4B42100678A50 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC930F51DD4B42100678A50 /* CloudKit.framework */; };
 		8DC930F71DD4B44D00678A50 /* ABModel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC3E690319B4C84500681A5A /* ABModel.framework */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8D39EFAC1E3A463B0084B71B /* CloudkitExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudkitExtension.swift; sourceTree = "<group>"; };
 		8DB533E01AFFEB74008C2078 /* NSDataJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSDataJSON.swift; sourceTree = "<group>"; };
 		8DC930F51DD4B42100678A50 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		8DC9310B1DD4C11E00678A50 /* TestsModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestsModels.swift; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 				8D5BD52B1DD47C1800D1D9A1 /* testModel */,
 				AC3E691219B4C84500681A5A /* ABModelTests.swift */,
 				AC3E691019B4C84500681A5A /* Supporting Files */,
+				8D39EFAC1E3A463B0084B71B /* CloudkitExtension.swift */,
 			);
 			path = ABModelTests;
 			sourceTree = "<group>";
@@ -276,6 +279,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8DC9310C1DD4C11E00678A50 /* TestsModels.swift in Sources */,
+				8D39EFAD1E3A463B0084B71B /* CloudkitExtension.swift in Sources */,
 				AC3E691319B4C84500681A5A /* ABModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

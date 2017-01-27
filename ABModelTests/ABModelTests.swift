@@ -45,10 +45,9 @@ class ABModelTests: XCTestCase {
         XCTAssert("ABModel super class you should override description in \(classStr)" == object.description)
     }
 
-
     func testWrong() {
         ABModel.debug = true
-        let object = WrongModel(dictionary: ["uninitialisedArray" : [stringBaseDico, stringBaseDico] as AnyObject,
+        let object = WrongModel(dictionary: ["uninitialisedArray": [stringBaseDico, stringBaseDico] as AnyObject,
                                              "replaceMe": "OK" as AnyObject, "strTest": "test" as AnyObject,
                                              "strTest2": "test" as AnyObject])
         XCTAssert(object.replaced == "OK")

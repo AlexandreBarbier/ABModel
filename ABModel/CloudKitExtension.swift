@@ -38,7 +38,6 @@ open class ABModelCloudKit: ABModel {
         if let rec = aDecoder.decodeObject(forKey: "record") as? CKRecord {
             record = rec
         }
-
     }
 
     open override func encode(with aCoder: NSCoder) {
