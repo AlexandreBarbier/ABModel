@@ -167,7 +167,7 @@ extension ABModel {
                 newValue = newArray
             }
 
-            if let eType = ABCached.shared.arrayElementType[key] as? ABModel.Type {
+            if let eType = ABCached.shared.arrayElementType["\(type(of: self)).\(key)"] as? ABModel.Type {
                 fillArray(eType)
             } else if value is [[String: AnyObject]] {
                 guard let newArray = objectValue as? [ABModel], newArray.count > 0 else {
@@ -178,7 +178,7 @@ extension ABModel {
                 }
                 let elementType = type(of: newArray[0])
 
-                ABCached.shared.arrayElementType.updateValue(elementType, forKey: key)
+                ABCached.shared.arrayElementType.updateValue(elementType, forKey: "\(type(of: self)).\(key)")
                 fillArray(elementType)
             }
         } else if !(value is ABModel) {
