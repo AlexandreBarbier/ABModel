@@ -31,7 +31,7 @@ open class ABModel: NSObject, NSCoding {
     static let superKey = "super"
 
     open override var description: String {
-        return "ABModel super class you should override description in \(NSStringFromClass(type(of: self)))"
+        return "\(self.toJSON())"
     }
 
     public required init?(coder aDecoder: NSCoder) {

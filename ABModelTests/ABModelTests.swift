@@ -41,8 +41,8 @@ class ABModelTests: XCTestCase {
 
     func testDescription() {
         let object = StringModel(dictionary:stringBaseDico)
-        let classStr = NSStringFromClass(type(of: object))
-        XCTAssert("ABModel super class you should override description in \(classStr)" == object.description)
+    
+        XCTAssert("\(object.toJSON())" == object.description)
     }
 
     func testWrong() {
