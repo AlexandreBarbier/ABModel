@@ -90,11 +90,11 @@ extension ABModel {
 // MARK: - Helper
 extension ABModel {
 
-    class func dPrint (value: Any) -> Void {
+    class func dPrint (value: Any) {
         ABModel.debug ? print("----- ABModel\tDEBUG -----\n\(value)\n------------\t------------") : ()
     }
 
-    class func errorPrint(value: Any) -> Void {
+    class func errorPrint(value: Any) {
         print("\t----- ABModel\tERROR -----\n\t\(Date())\t\n\(value)\n\t------------\t------------")
     }
 
@@ -246,8 +246,8 @@ extension ABModel {
     func cleanModel(dictionnary: [String: AnyObject]) {
         let keys: [String] = fillMirrorKeys()
         for key in keys {
-            if dictionnary.contains(where: { (k: String, _: AnyObject) -> Bool in
-                return key == k
+            if dictionnary.contains(where: { (dKey: String, _: AnyObject) -> Bool in
+                return key == dKey
             }) {
                 continue
             }

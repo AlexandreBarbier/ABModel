@@ -41,7 +41,7 @@ class ABModelTests: XCTestCase {
 
     func testDescription() {
         let object = StringModel(dictionary:stringBaseDico)
-    
+
         XCTAssert("\(object.toJSON())" == object.description)
     }
 
@@ -54,7 +54,7 @@ class ABModelTests: XCTestCase {
         XCTAssert(object.strTest == "test")
 
         ABModel.debug = false
-        let object2 = WrongModel(dictionary: ["uninitialisedArray" : [stringBaseDico, stringBaseDico] as AnyObject,
+        let object2 = WrongModel(dictionary: ["uninitialisedArray": [stringBaseDico, stringBaseDico] as AnyObject,
                                              "replaceMe": "OK" as AnyObject, "strTest": "test" as AnyObject,
                                              "strTest2": "test" as AnyObject])
         XCTAssert(object2.replaced == "OK")
@@ -62,17 +62,16 @@ class ABModelTests: XCTestCase {
     }
 
     func testError() {
-        let object = WrongModel(dictionary: ["uninitialisedArray" : [stringBaseDico, stringBaseDico] as AnyObject,
+        let object = WrongModel(dictionary: ["uninitialisedArray": [stringBaseDico, stringBaseDico] as AnyObject,
                                              "replaceMe": "OK" as AnyObject])
         XCTAssert(object.replaced == "OK")
     }
-
 
     func testCoder() {
         let object = StringModel(dictionary:stringBaseDico)
 
         let data = NSKeyedArchiver.archivedData(withRootObject: object)
-        let _ : UserDefaults = {
+        let _: UserDefaults = {
             $0.set(data, forKey:"test")
             $0.synchronize()
             return $0
