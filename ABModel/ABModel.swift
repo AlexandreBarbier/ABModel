@@ -155,6 +155,11 @@ extension ABModel {
         }
         var newValue: Any?
 
+        if value is [ABModel] {
+            super.setValue(value, forKey: key)
+            return
+        }
+
         if value is [AnyObject] {
             let objectValue = self.value(forKey: key)
             let fillArray = {(eType: ABModel.Type) in
