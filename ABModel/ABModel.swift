@@ -199,14 +199,17 @@ extension ABModel {
 // MARK: - private
 extension ABModel {
 
-    func applyRegex(str: NSString) -> String {
-        let matches = ABModel.reg!.matches(in: str as String,
+    func applyRegex(str: NSString?) -> String? {
+        if let str = str {
+            let matches = ABModel.reg!.matches(in: str as String,
                                            options: NSRegularExpression.MatchingOptions.reportCompletion,
                                            range: NSRange(location: 0, length: str.length))
-        let result = matches.map({ (matchResult) -> String in
-            return str.substring(with: matchResult.rangeAt(1))
-        }).joined(separator: ".")
-        return result
+            let result = matches.map({ (matchResult) -> String in
+                return str.substring(with: matchResult.rangeAt(1))
+            }).joined(separator: ".")
+            return result
+        }
+        return nil
     }
 
     func getAttributeType(for key: String) -> AnyClass? {
@@ -214,13 +217,15 @@ extension ABModel {
             return cachedClass
         }
         var objectClass: AnyClass? = nil
-        if let UTFKey = (key as NSString).utf8String {
-            let propAttr = property_getAttributes(class_getProperty(type(of: self), UTFKey))
-            let str = NSString.init(utf8String: propAttr!)!
-            let result = applyRegex(str: str)
+
+        if let UTFKey = (key as NSString).utf8String,
+            let propAttr = property_getAttributes(class_getProperty(type(of: self), UTFKey)),
+            let str = NSString.init(utf8String: propAttr),
+            let result = applyRegex(str: str) {
             objectClass = NSClassFromString(result)
             ABCached.shared.appType.updateValue(objectClass, forKey: "\(type(of: self)).\(key)")
         }
+
         return objectClass
     }
 
