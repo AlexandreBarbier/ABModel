@@ -127,7 +127,9 @@ extension ABModel {
                 }
             }
             if ignoreKey(key, value: val) {
-                finalDictionnary.remove(at: finalDictionnary.index(forKey: key)!)
+                if let index = finalDictionnary.index(forKey: key) {
+                    finalDictionnary.remove(at: index)
+                }
             }
         }
         setValuesForKeys(finalDictionnary)
