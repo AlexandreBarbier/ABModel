@@ -203,13 +203,15 @@ extension ABModel {
 
     func applyRegex(str: NSString?) -> String? {
         if let str = str {
-            let matches = ABModel.reg!.matches(in: str as String,
-                                           options: NSRegularExpression.MatchingOptions.reportCompletion,
-                                           range: NSRange(location: 0, length: str.length))
-            let result = matches.map({ (matchResult) -> String in
-                return str.substring(with: matchResult.rangeAt(1))
-            }).joined(separator: ".")
-            return result
+            if let reg = ABModel.reg, str.length > 0 {
+                let matches = reg.matches(in: str as String,
+                                          options: NSRegularExpression.MatchingOptions.reportCompletion,
+                                          range: NSRange(location: 0, length: str.length))
+                let result = matches.map({ (matchResult) -> String in
+                    return str.substring(with: matchResult.rangeAt(1))
+                }).joined(separator: ".")
+                return result
+            }
         }
         return nil
     }
