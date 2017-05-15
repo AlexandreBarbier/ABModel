@@ -208,7 +208,10 @@ extension ABModel {
                                           options: NSRegularExpression.MatchingOptions.reportCompletion,
                                           range: NSRange(location: 0, length: str.length))
                 let result = matches.map({ (matchResult) -> String in
-                    return str.substring(with: matchResult.rangeAt(1))
+                    if matchResult.range.location != NSNotFound, matchResult.numberOfRanges > 1 {
+                        return str.substring(with: matchResult.rangeAt(1))
+                    }
+                    return ""
                 }).joined(separator: ".")
                 return result
             }
