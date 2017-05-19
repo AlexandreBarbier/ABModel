@@ -54,8 +54,7 @@ open class ABModel: NSObject, NSCoding {
     }
 
     open func encode(with aCoder: NSCoder) {
-        let dico = toJSON()
-        aCoder.encode(dico, forKey: ABModel.rootKey)
+        aCoder.encode(toJSON(), forKey: ABModel.rootKey)
     }
 
     public override init() {
@@ -165,13 +164,13 @@ extension ABModel {
         if value is [AnyObject] {
             let objectValue = self.value(forKey: key)
             let fillArray = {(eType: ABModel.Type) in
-                var newArray: [ABModel] = []
+                var newArray: [ABModel]?
                 if let value = value as? [[String: AnyObject]] {
                     newArray = value.map({ (dico) -> ABModel in
                         return eType.init(dictionary: dico)
                     })
                 }
-                newValue = newArray
+                newValue = newArray ?? []
             }
 
             if let eType = ABCached.shared.arrayElementType["\(type(of: self)).\(key)"] as? ABModel.Type {
