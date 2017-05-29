@@ -191,6 +191,8 @@ extension ABModel {
             if let objectType = getAttributeType(for:key) as? ABModel.Type,
                 let value = value as? [String : AnyObject] {
                 newValue = objectType.init(dictionary: value)
+            } else if let _ = value as? [String : AnyObject] {
+                return
             }
         }
         super.setValue(newValue ?? value, forKey: key)
@@ -228,6 +230,7 @@ extension ABModel {
             let propAttr = property_getAttributes(class_getProperty(type(of: self), UTFKey)),
             let str = NSString.init(utf8String: propAttr),
             let result = applyRegex(str: str) {
+
             objectClass = NSClassFromString(result)
             ABCached.shared.appType.updateValue(objectClass, forKey: "\(type(of: self)).\(key)")
         }
